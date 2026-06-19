@@ -13,6 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Trust all proxies when behind a reverse proxy/tunnel
+        $middleware->trustProxies(at: '*');
+
         // Route middleware aliases used across the app.
         $middleware->alias([
             'permission' => \App\Http\Middleware\EnsureUserHasPermission::class,
