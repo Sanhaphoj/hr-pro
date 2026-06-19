@@ -4,7 +4,14 @@
 **Corporate มืออาชีพ** สร้างด้วย **PHP Laravel 11 + MySQL** เรนเดอร์ฝั่งเซิร์ฟเวอร์ด้วย Blade
 และ Design System ที่เขียนเองทั้งหมด (ไม่ต้อง build ขั้นตอน Node)
 
-> เข้าสู่ระบบด้วยบัญชีทดลอง `admin@hrpro.local` / `password`
+> 🚀 **ทดลองใช้งานฟรี (Live Demo):** [https://spicy-heads-find.loca.lt](https://spicy-heads-find.loca.lt)
+> *(หากระบบถามรหัสผ่าน / Tunnel Password ของ localtunnel ให้กรอก IP: `182.53.30.99` เพื่อเข้าสู่ระบบ)*
+>
+> **บัญชีสำหรับทดลองใช้งาน:**
+> - ผู้ดูแลระบบ (Super Admin): `admin@hrpro.local` / `password`
+> - ฝ่ายบุคคล (HR Manager): `hr@hrpro.local` / `password`
+> - หัวหน้างาน (Manager): `manager@hrpro.local` / `password`
+> - พนักงาน (Employee): `employee@hrpro.local` / `password`
 
 ---
 
