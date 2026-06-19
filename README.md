@@ -5,7 +5,7 @@
 และ Design System ที่เขียนเองทั้งหมด (ไม่ต้อง build ขั้นตอน Node)
 
 > 🚀 **ทดลองใช้งานฟรี (Live Demo):** [https://spicy-heads-find.loca.lt](https://spicy-heads-find.loca.lt)
-> *(หากระบบถามรหัสผ่าน / Tunnel Password ของ localtunnel ให้กรอก IP: `182.53.30.99` เพื่อเข้าสู่ระบบ)*
+> *(หากระบบถามรหัสผ่าน / Tunnel Password ของ localtunnel ให้กรอก IP: `1.1.149.106` เพื่อเข้าสู่ระบบ)*
 >
 > **บัญชีสำหรับทดลองใช้งาน:**
 > - ผู้ดูแลระบบ (Super Admin): `admin@hrpro.local` / `password`
