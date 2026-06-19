@@ -1,0 +1,16 @@
+.git
+.github
+vendor
+node_modules
+.env
+.env.*
+!.env.example
+database/database.sqlite
+storage/logs/*.log
+storage/.seeded
+bootstrap/cache/*.php
+composer.phar
+.workflow-*.js
+.claude
+tests
+README.md

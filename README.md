@@ -161,13 +161,32 @@ php artisan test
 
 ---
 
-## 📦 Deployment
+## ☁️ Deploy ฟรีจาก GitHub (Render) — เปิดเว็บได้ตลอด ไม่ต้องเปิดเครื่องเอง
 
-- **เป้าหมาย**: เซิร์ฟเวอร์ที่มี PHP 8.2+ (Nginx/Apache + PHP-FPM) หรือ Laravel Forge/Vapor
+> หมายเหตุ: GitHub Pages รันได้แค่ static (HTML/CSS/JS) — รัน PHP/Laravel ไม่ได้
+> เราจึงเก็บโค้ดบน GitHub แล้วให้ **Render** (ฟรี ไม่ต้องใช้บัตรเครดิต) ดึงไป build + รันให้
+> ระบบใช้ **Docker + SQLite** จึงไม่ต้องตั้งฐานข้อมูลแยก และ deploy อัตโนมัติทุกครั้งที่ push
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Sanhaphoj/hr-pro)
+
+**ขั้นตอน (ครั้งเดียว ~5 นาที):**
+1. ไปที่ <https://render.com> → Sign up ด้วยบัญชี **GitHub** (ฟรี)
+2. กด **New +** → **Blueprint** → เลือก repo `Sanhaphoj/hr-pro` (Render จะอ่าน [`render.yaml`](render.yaml) ให้อัตโนมัติ)
+3. กด **Apply** → รอ build เสร็จ (~3–5 นาที) จะได้ URL เช่น `https://hr-pro.onrender.com`
+4. (ถ้าต้องการ) ตั้ง `APP_URL` ใน Render = URL ที่ได้ เพื่อให้ลิงก์สมบูรณ์
+5. เปิด URL → เข้าสู่ระบบด้วยบัญชีทดลอง (`admin@hrpro.local` / `password`)
+
+ไฟล์ที่เกี่ยวข้อง: [`Dockerfile`](Dockerfile) · [`docker/entrypoint.sh`](docker/entrypoint.sh) · [`render.yaml`](render.yaml)
+ข้อจำกัด Free tier: เซิร์ฟเวอร์จะ "หลับ" หลังไม่มีคนใช้ ~15 นาที และตื่นใหม่ ~30–60 วินาทีในคำขอแรก; ข้อมูลตัวอย่างจะถูก seed ใหม่เมื่อ redeploy (เหมาะกับเดโม)
+*(ภาพ Docker นี้ใช้ได้กับ Koyeb / Fly.io / Railway เช่นกัน — ทุกที่ที่รัน container ได้)*
+
+### Deploy แบบทั่วไป (เซิร์ฟเวอร์ของตนเอง / production จริง)
+
+- **เป้าหมาย**: เซิร์ฟเวอร์ที่มี PHP 8.2+ (Nginx/Apache + PHP-FPM) หรือ Laravel Forge/Cloud
 - **Build/optimize**: `composer install --no-dev --optimize-autoloader && php artisan config:cache route:cache view:cache`
 - **Migration**: `php artisan migrate --force`
 - **ENV ที่ต้องตั้ง (ตามลำดับ)**: `APP_KEY` → `APP_ENV=production` `APP_DEBUG=false` → `DB_*` → `SESSION_SECURE_COOKIE=true` (หลัง HTTPS) → `MAIL_*` (ถ้าใช้อีเมล)
-- เปลี่ยน document root ไปที่โฟลเดอร์ `public/`
+- เปลี่ยน document root ไปที่โฟลเดอร์ `public/` (สำหรับ production จริงแนะนำ Nginx + PHP-FPM แทน `php artisan serve`)
 
 ---
 
