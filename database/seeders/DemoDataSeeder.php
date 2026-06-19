@@ -4,11 +4,13 @@ namespace Database\Seeders;
 
 use App\Models\Announcement;
 use App\Models\Attendance;
+use App\Models\AuditLog;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\LeaveBalance;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
+use App\Models\Notification;
 use App\Models\Position;
 use App\Models\Role;
 use App\Models\User;
@@ -203,19 +205,60 @@ class DemoDataSeeder extends Seeder
             ]);
         }
 
-        // --- Attendance for today -----------------------------------------
-        foreach ($allEmployees->random(30) as $emp) {
-            $clockIn = now()->setTime(fake()->numberBetween(8, 9), fake()->numberBetween(0, 59));
-            $clockOut = (clone $clockIn)->addHours(8)->addMinutes(fake()->numberBetween(0, 45));
-            Attendance::create([
+        // --- Varied historical leave requests (approved/rejected/cancelled) ---
+        $personal = $leaveTypes->firstWhere('code', 'PERSONAL');
+
+        LeaveRequest::create([
+            'employee_id' => $demoEmployee->id,
+            'leave_type_id' => $personal->id,
+            'start_date' => now()->subDays(40)->toDateString(),
+            'end_date' => now()->subDays(40)->toDateString(),
+            'total_days' => 1,
+            'reason' => 'ติดธุระส่วนตัว',
+            'status' => 'rejected',
+            'approver_id' => $demoUsers['hr-manager']->id,
+            'approved_at' => now()->subDays(41),
+            'rejection_reason' => 'ช่วงเวลาดังกล่าวมีงานเร่งด่วน กรุณาเลือกวันอื่น',
+        ]);
+
+        LeaveRequest::create([
+            'employee_id' => $demoEmployee->id,
+            'leave_type_id' => $annual->id,
+            'start_date' => now()->subDays(70)->toDateString(),
+            'end_date' => now()->subDays(68)->toDateString(),
+            'total_days' => 3,
+            'reason' => 'ท่องเที่ยวต่างประเทศ (ยกเลิกแล้ว)',
+            'status' => 'cancelled',
+        ]);
+
+        foreach ($allEmployees->random(14) as $emp) {
+            $type = $leaveTypes->whereIn('code', ['ANNUAL', 'SICK', 'PERSONAL'])->random();
+            $startAt = now()->subDays(fake()->numberBetween(15, 150));
+            $days = fake()->numberBetween(1, 3);
+            $status = fake()->randomElement(['approved', 'approved', 'approved', 'rejected']);
+            LeaveRequest::create([
                 'employee_id' => $emp->id,
-                'work_date' => now()->toDateString(),
-                'clock_in' => $clockIn,
-                'clock_out' => $clockOut,
-                'worked_minutes' => $clockIn->diffInMinutes($clockOut),
-                'status' => $clockIn->hour >= 9 && $clockIn->minute > 15 ? 'late' : 'present',
+                'leave_type_id' => $type->id,
+                'start_date' => $startAt->toDateString(),
+                'end_date' => $startAt->copy()->addDays($days - 1)->toDateString(),
+                'total_days' => $days,
+                'reason' => fake()->sentence(),
+                'status' => $status,
+                'approver_id' => $demoUsers['hr-manager']->id,
+                'approved_at' => $startAt->copy()->subDays(2),
+                'rejection_reason' => $status === 'rejected' ? 'ไม่อนุมัติเนื่องจากกำลังคนไม่เพียงพอในช่วงดังกล่าว' : null,
             ]);
         }
+
+        // --- Attendance history (past ~2 weeks of working days) -----------
+        $historyEmployees = $allEmployees
+            ->where('id', '!=', $demoEmployee->id)
+            ->random(min(28, max($allEmployees->count() - 1, 1)));
+        foreach ($historyEmployees as $emp) {
+            $this->seedAttendanceHistory($emp, true);
+        }
+        // Demo employee: seed past days but leave today open for a live clock-in demo.
+        $this->seedAttendanceHistory($demoEmployee, false);
 
         // --- Announcements -------------------------------------------------
         $admin = $demoUsers['super-admin'];
@@ -235,6 +278,89 @@ class DemoDataSeeder extends Seeder
                 'published_at' => now()->subDays($i),
                 'author_id' => $admin->id,
                 'pinned' => $pinned,
+            ]);
+        }
+
+        // --- In-app notifications -----------------------------------------
+        $employeeUser = $demoUsers['employee'];
+        $hrUser = $demoUsers['hr-manager'];
+        $notifications = [
+            [$employeeUser->id, 'success', 'อนุมัติการลา', 'คำขอลาป่วยของคุณได้รับการอนุมัติแล้ว', '/leave-requests', now()->subDays(15)],
+            [$employeeUser->id, 'error', 'ปฏิเสธการลา', 'คำขอลากิจของคุณไม่ได้รับการอนุมัติ กรุณาดูเหตุผล', '/leave-requests', now()->subDays(41)],
+            [$employeeUser->id, 'info', 'ยินดีต้อนรับ', 'ยินดีต้อนรับเข้าสู่ระบบ HR PRO เริ่มต้นใช้งานได้จากเมนูด้านซ้าย', null, null],
+            [$hrUser->id, 'warning', 'มีคำขอลารออนุมัติ', 'มีคำขอลารอการอนุมัติในระบบ กรุณาตรวจสอบที่เมนูอนุมัติการลา', '/leave-approvals', null],
+            [$hrUser->id, 'info', 'พนักงานเข้าใหม่', 'มีการเพิ่มข้อมูลพนักงานใหม่เข้าสู่ระบบ', '/employees', now()->subDays(2)],
+        ];
+        foreach ($notifications as [$uid, $type, $title, $message, $link, $readAt]) {
+            Notification::create([
+                'user_id' => $uid,
+                'type' => $type,
+                'title' => $title,
+                'message' => $message,
+                'link' => $link,
+                'read_at' => $readAt,
+            ]);
+        }
+
+        // --- Audit log trail ----------------------------------------------
+        $auditEntries = [
+            [$admin->id, 'login', 'เข้าสู่ระบบ (admin@hrpro.local)', now()->subHours(2)],
+            [$hrUser->id, 'login', 'เข้าสู่ระบบ (hr@hrpro.local)', now()->subHours(5)],
+            [$hrUser->id, 'created', 'เพิ่มพนักงานใหม่เข้าสู่ระบบ', now()->subDays(2)],
+            [$hrUser->id, 'approved', 'อนุมัติคำขอลางาน', now()->subDays(3)],
+            [$hrUser->id, 'rejected', 'ปฏิเสธคำขอลางาน', now()->subDays(4)],
+            [$admin->id, 'created', 'สร้างประกาศ: ยินดีต้อนรับสู่ระบบ HR PRO', now()->subDays(5)],
+            [$admin->id, 'updated', 'แก้ไขสิทธิ์ของบทบาท "หัวหน้างาน"', now()->subDays(6)],
+            [$employeeUser->id, 'created', 'ส่งคำขอลางาน', now()->subDays(14)],
+            [$employeeUser->id, 'updated', 'แก้ไขข้อมูลโปรไฟล์ส่วนตัว', now()->subDays(10)],
+        ];
+        foreach ($auditEntries as [$uid, $action, $description, $when]) {
+            $log = AuditLog::create([
+                'user_id' => $uid,
+                'action' => $action,
+                'description' => $description,
+                'ip_address' => fake()->ipv4(),
+                'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) HR PRO Demo',
+            ]);
+            $log->forceFill(['created_at' => $when, 'updated_at' => $when])->save();
+        }
+    }
+
+    /**
+     * Create attendance rows for the past ~2 weeks of weekdays for one employee.
+     * Includes occasional lateness/absence, and (optionally) today's record.
+     */
+    private function seedAttendanceHistory(Employee $employee, bool $includeToday): void
+    {
+        for ($d = $includeToday ? 0 : 1; $d <= 14; $d++) {
+            $date = now()->subDays($d);
+            if ($date->isWeekend()) {
+                continue;
+            }
+
+            // Occasional absence on past days.
+            if ($d > 0 && fake()->boolean(8)) {
+                Attendance::create([
+                    'employee_id' => $employee->id,
+                    'work_date' => $date->toDateString(),
+                    'status' => 'absent',
+                    'worked_minutes' => 0,
+                ]);
+                continue;
+            }
+
+            $clockIn = $date->copy()->setTime(fake()->numberBetween(8, 9), fake()->numberBetween(0, 59));
+            $stillWorking = $d === 0 && fake()->boolean(35); // some haven't clocked out yet today
+            $clockOut = $stillWorking ? null : (clone $clockIn)->addHours(8)->addMinutes(fake()->numberBetween(0, 55));
+            $late = $clockIn->hour > 9 || ($clockIn->hour === 9 && $clockIn->minute > 15);
+
+            Attendance::create([
+                'employee_id' => $employee->id,
+                'work_date' => $date->toDateString(),
+                'clock_in' => $clockIn,
+                'clock_out' => $clockOut,
+                'worked_minutes' => $clockOut ? (int) $clockIn->diffInMinutes($clockOut) : 0,
+                'status' => $late ? 'late' : 'present',
             ]);
         }
     }
