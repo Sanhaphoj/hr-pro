@@ -24,7 +24,12 @@ mkdir -p database \
 # Schema + demo data (seed only once per container filesystem).
 php artisan migrate --force
 if [ ! -f storage/.seeded ]; then
-    php artisan db:seed --force && touch storage/.seeded || true
+    if php artisan db:seed --force; then
+        touch storage/.seeded
+        echo "HR PRO: demo data seeded successfully."
+    else
+        echo "HR PRO: WARNING — demo data seeding failed (see errors above); the app will still start."
+    fi
 fi
 
 php artisan storage:link || true

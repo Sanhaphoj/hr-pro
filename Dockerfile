@@ -9,9 +9,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libzip-dev \
         libsqlite3-dev \
         libonig-dev \
+        libicu-dev \
         unzip \
         git \
-    && docker-php-ext-install pdo_sqlite mbstring zip \
+    && docker-php-ext-install pdo_sqlite mbstring zip intl \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # --- Composer ---------------------------------------------------------------
