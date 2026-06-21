@@ -48,6 +48,21 @@ class RolePermissionSeeder extends Seeder
             ['reports.view', 'reports', 'ดูรายงานและสถิติ'],
             ['audit-logs.view', 'audit-logs', 'ดูบันทึกการใช้งานระบบ'],
 
+            ['payroll.view', 'payroll', 'ดูข้อมูลเงินเดือน'],
+            ['payroll.manage', 'payroll', 'จัดการ/คำนวณเงินเดือน'],
+
+            ['recruitment.view', 'recruitment', 'ดูประกาศรับสมัครและผู้สมัคร'],
+            ['recruitment.manage', 'recruitment', 'จัดการการสรรหา'],
+
+            ['performance.view', 'performance', 'ดูผลการประเมิน'],
+            ['performance.manage', 'performance', 'จัดการการประเมินผล'],
+
+            ['training.view', 'training', 'ดูหลักสูตรฝึกอบรม'],
+            ['training.manage', 'training', 'จัดการหลักสูตร/การลงทะเบียน'],
+
+            ['documents.view', 'documents', 'ดูคลังเอกสาร'],
+            ['documents.manage', 'documents', 'จัดการคลังเอกสาร'],
+
             ['users.view', 'users', 'ดูผู้ใช้งานระบบ'],
             ['users.create', 'users', 'เพิ่มผู้ใช้งานระบบ'],
             ['users.update', 'users', 'แก้ไขผู้ใช้งานระบบ'],
@@ -73,11 +88,17 @@ class RolePermissionSeeder extends Seeder
             'leave-types.view', 'leave-types.create', 'leave-types.update', 'leave-types.delete',
             'leave-requests.viewAll', 'leave-approvals.view', 'leave-approvals.approve',
             'attendance.viewAll', 'announcements.manage', 'reports.view', 'audit-logs.view',
+            'payroll.view', 'payroll.manage',
+            'recruitment.view', 'recruitment.manage',
+            'performance.view', 'performance.manage',
+            'training.view', 'training.manage',
+            'documents.view', 'documents.manage',
         ];
 
         $manager = [
             'employees.view', 'leave-requests.viewAll', 'leave-approvals.view',
             'leave-approvals.approve', 'attendance.viewAll', 'reports.view',
+            'performance.view', 'training.view', 'recruitment.view',
         ];
 
         $roles = [

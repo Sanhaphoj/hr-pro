@@ -2,8 +2,10 @@
 @section('title', 'เข้าสู่ระบบ')
 
 @section('content')
-    <h1 style="font-size:22px; margin-bottom:4px;">ยินดีต้อนรับกลับ</h1>
-    <p class="text-soft" style="margin:0 0 22px;">กรุณาเข้าสู่ระบบเพื่อใช้งาน HR PRO</p>
+    <div class="auth__welcome">
+        <h1>ยินดีต้อนรับกลับ</h1>
+        <p class="text-soft">กรุณาเข้าสู่ระบบเพื่อใช้งาน HR PRO</p>
+    </div>
 
     <form method="POST" action="{{ route('login.store') }}">
         @csrf

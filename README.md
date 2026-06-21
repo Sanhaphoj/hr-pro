@@ -36,6 +36,8 @@
 
 ## 🏗️ สถาปัตยกรรม & เหตุผลเลือก Stack
 
+> 📐 **เอกสารการออกแบบฉบับเต็ม (System Design Document):** ดู **[DESIGN.md](DESIGN.md)** — สถาปัตยกรรมเชิงชั้น, ERD, RBAC, กระบวนการทางธุรกิจ และ Design System พร้อมไดอะแกรม Mermaid แบบเป็นทางการ
+
 - **Laravel 11 + MySQL** — ตามที่ระบุ ไม่มีการแทนที่; ecosystem ครบ (Eloquent, Validation, Auth, Queue) ทีมไทยคุ้นเคย โฮสต์ได้ทุกที่ที่มี PHP 8.2+
 - **Server-rendered Blade + Design System เขียนเอง** — ไม่มีขั้นตอน build (no Node/Vite required) ทำให้ติดตั้งและรันได้ทันที, bundle เล็ก, LCP เร็ว
 - **Session cookie auth** (ไม่ใช่ JWT) — เหมาะกับเว็บแอปภายในองค์กรที่เรนเดอร์ฝั่งเซิร์ฟเวอร์ ปลอดภัยด้วย CSRF + HttpOnly cookie
@@ -192,7 +194,9 @@ php artisan test
 
 ## 🗺️ Feature Map (MVP / Phase 2)
 
-- **[MVP]** Auth & RBAC, Employees, Departments, Positions, Leave (types/requests/approvals/balances),
+- **[MVP ✅]** Auth & RBAC, Employees, Departments, Positions, Leave (types/requests/approvals/balances),
   Attendance, Announcements, Dashboard, Settings (users/roles), Reports พื้นฐาน, Audit Log, Notifications
-- **[Phase 2]** Payroll/เงินเดือน, Recruitment/สรรหา, Performance review, Training, Document management,
-  Org-chart แบบกราฟิก, ส่งออก Excel/PDF, แจ้งเตือนทางอีเมล/LINE, Multi-language toggle, Self-service onboarding
+- **[Phase 2 ✅ — ส่งมอบแล้ว]** Payroll/เงินเดือน, Recruitment/สรรหา, Performance review, Training, Document management,
+  Org-chart แบบกราฟิก, ส่งออก Excel/PDF (CSV + พิมพ์เป็น PDF), แจ้งเตือนทางอีเมล/LINE, Multi-language toggle (ไทย/EN), Self-service onboarding
+
+ดูรายละเอียดและสถานะการต่อยอดได้ใน [DESIGN.md §12](DESIGN.md#12-แผนพัฒนาต่อ-roadmap)
