@@ -19,7 +19,9 @@ class EmployeeFactory extends Factory
             'employee_code' => 'EMP-'.fake()->unique()->numberBetween(1000, 999999),
             'first_name' => $first,
             'last_name' => $last,
-            'email' => fake()->unique()->safeEmail(),
+            // ASCII email so seeding never depends on the intl extension to
+            // transliterate Thai names (Faker safeEmail() throws without intl).
+            'email' => 'staff'.fake()->unique()->numberBetween(100000, 999999).'@hrpro.local',
             'phone' => fake()->numerify('08########'),
             'national_id' => fake()->numerify('#############'),
             'date_of_birth' => fake()->dateTimeBetween('-55 years', '-22 years')->format('Y-m-d'),
