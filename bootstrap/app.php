@@ -16,6 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
         // Trust all proxies when behind a reverse proxy/tunnel
         $middleware->trustProxies(at: '*');
 
+        // Apply the user's chosen UI language on every web request.
+        $middleware->web(append: [
+            \App\Http\Middleware\SetLocale::class,
+        ]);
+
         // Route middleware aliases used across the app.
         $middleware->alias([
             'permission' => \App\Http\Middleware\EnsureUserHasPermission::class,

@@ -12,27 +12,25 @@
 </head>
 <body>
     <div class="auth">
-        <div class="auth__aside">
-            <h2>ระบบบริหารทรัพยากรบุคคล<br>สำหรับองค์กรยุคใหม่</h2>
-            <p>จัดการข้อมูลพนักงาน การลา การลงเวลา และการอนุมัติ ได้ในที่เดียว อย่างปลอดภัยและเป็นมืออาชีพ</p>
-            <ul>
-                <li><x-icon name="users" /> ฐานข้อมูลพนักงานแบบรวมศูนย์</li>
-                <li><x-icon name="calendar" /> ระบบลางานพร้อมสายอนุมัติ</li>
-                <li><x-icon name="clock" /> ลงเวลาเข้า–ออกงานอัตโนมัติ</li>
-                <li><x-icon name="shield" /> สิทธิ์การเข้าถึงตามบทบาท (RBAC)</li>
-            </ul>
-        </div>
-        <div class="auth__form">
+        <div class="auth__wrap">
             <div class="auth__card">
-                <div class="logo-row">
-                    <span class="logo">HR</span>
-                    <div>
-                        <b style="font-size:18px;">HR PRO</b>
-                        <div class="cell-sub">{{ config('hrpro.company_name') }}</div>
+                <div class="auth__head">
+                    <div class="auth__brand">
+                        <span class="logo">HR</span>
+                        <div>
+                            <b>HR PRO</b>
+                            <span class="auth__co">{{ config('hrpro.company_name') }}</span>
+                        </div>
                     </div>
+                    <div class="auth__tag">ระบบบริหารทรัพยากรบุคคลสำหรับองค์กรมืออาชีพ</div>
                 </div>
-                @include('partials.flash')
-                @yield('content')
+                <div class="auth__body">
+                    @include('partials.flash')
+                    @yield('content')
+                </div>
+            </div>
+            <div class="auth__foot">
+                <x-icon name="lock" /> การเชื่อมต่อปลอดภัย &middot; &copy; {{ date('Y') }} {{ config('hrpro.company_name') }}
             </div>
         </div>
     </div>

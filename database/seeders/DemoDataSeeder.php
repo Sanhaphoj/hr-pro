@@ -11,12 +11,20 @@ use App\Models\LeaveBalance;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
 use App\Models\Notification;
+use App\Models\Document;
+use App\Models\JobPosting;
+use App\Models\OnboardingTask;
+use App\Models\PerformanceReview;
 use App\Models\Position;
 use App\Models\Role;
+use App\Models\TrainingCourse;
+use App\Models\TrainingEnrollment;
 use App\Models\User;
+use App\Services\PayrollService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class DemoDataSeeder extends Seeder
 {
@@ -323,6 +331,83 @@ class DemoDataSeeder extends Seeder
                 'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) HR PRO Demo',
             ]);
             $log->forceFill(['created_at' => $when, 'updated_at' => $when])->save();
+        }
+
+        // ================= Phase 2 demo data =================
+
+        // --- Payroll (previous month, all salaried employees) -------------
+        $payPeriod = now()->subMonthNoOverflow();
+        app(PayrollService::class)->generateForPeriod($payPeriod->year, $payPeriod->month);
+
+        // --- Recruitment ---------------------------------------------------
+        $itDeptId = $departments->firstWhere('code', 'DPT-IT')?->id;
+        $posting = JobPosting::create([
+            'title' => 'นักพัฒนาซอฟต์แวร์ (Backend)',
+            'department_id' => $itDeptId,
+            'description' => "พัฒนาและดูแลระบบภายในองค์กรด้วย PHP / Laravel\nทำงานร่วมกับทีมแบบ Agile",
+            'openings' => 2,
+            'employment_type' => 'full_time',
+            'status' => 'open',
+            'posted_at' => now()->subDays(5),
+        ]);
+        foreach ([['ปิยะ ผู้สมัคร', 'applied'], ['Jane Applicant', 'interview'], ['John Doe', 'screening']] as [$cName, $cStage]) {
+            $posting->candidates()->create(['name' => $cName, 'stage' => $cStage]);
+        }
+
+        // --- Performance reviews ------------------------------------------
+        foreach ($allEmployees->random(3) as $emp) {
+            PerformanceReview::create([
+                'employee_id' => $emp->id,
+                'reviewer_id' => $demoUsers['hr-manager']->id,
+                'period' => now()->year.'-H1',
+                'score' => fake()->numberBetween(3, 5),
+                'strengths' => 'ทำงานเป็นทีมได้ดี มีความรับผิดชอบสูง ส่งงานตรงเวลา',
+                'improvements' => 'พัฒนาทักษะการสื่อสารและการนำเสนอต่อที่ประชุม',
+                'status' => 'submitted',
+                'reviewed_at' => now()->subDays(10),
+            ]);
+        }
+
+        // --- Training -----------------------------------------------------
+        $course = TrainingCourse::create([
+            'title' => 'ปฐมนิเทศพนักงานใหม่',
+            'description' => 'แนะนำองค์กร นโยบาย วัฒนธรรม และการใช้งานระบบภายใน',
+            'hours' => 6,
+            'scheduled_date' => now()->addDays(14)->toDateString(),
+            'is_active' => true,
+        ]);
+        foreach ($allEmployees->random(8) as $emp) {
+            TrainingEnrollment::firstOrCreate(
+                ['training_course_id' => $course->id, 'employee_id' => $emp->id],
+                ['status' => fake()->randomElement(['enrolled', 'enrolled', 'completed'])],
+            );
+        }
+
+        // --- Documents (write small placeholder files so download works) ---
+        foreach ([['คู่มือพนักงาน 2569', 'policy'], ['แบบฟอร์มขอลางาน', 'form']] as $i => [$docTitle, $docCat]) {
+            $path = "documents/seed-{$i}.txt";
+            Storage::disk('public')->put($path, "เอกสารตัวอย่าง: {$docTitle}\n".str_repeat('=', 24));
+            Document::create([
+                'title' => $docTitle,
+                'category' => $docCat,
+                'file_path' => $path,
+                'original_name' => "{$docTitle}.txt",
+                'mime' => 'text/plain',
+                'size' => Storage::disk('public')->size($path),
+                'uploaded_by' => $admin->id,
+                'is_public' => true,
+            ]);
+        }
+
+        // --- Onboarding checklist for the demo employee -------------------
+        foreach (OnboardingTask::TEMPLATE as $i => [$otTitle, $otDesc]) {
+            $demoEmployee->onboardingTasks()->create([
+                'title' => $otTitle,
+                'description' => $otDesc,
+                'sort_order' => $i,
+                'is_done' => $i < 2,
+                'completed_at' => $i < 2 ? now()->subDays(3 - $i) : null,
+            ]);
         }
     }
 

@@ -94,6 +94,26 @@ class Employee extends Model
         return $this->hasMany(Attendance::class);
     }
 
+    public function payrolls(): HasMany
+    {
+        return $this->hasMany(Payroll::class);
+    }
+
+    public function performanceReviews(): HasMany
+    {
+        return $this->hasMany(PerformanceReview::class);
+    }
+
+    public function trainingEnrollments(): HasMany
+    {
+        return $this->hasMany(TrainingEnrollment::class);
+    }
+
+    public function onboardingTasks(): HasMany
+    {
+        return $this->hasMany(OnboardingTask::class);
+    }
+
     // ----- Accessors --------------------------------------------------------
 
     public function getFullNameAttribute(): string
