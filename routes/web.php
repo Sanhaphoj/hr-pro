@@ -41,37 +41,6 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
 
-// TEMP diagnostic — secret-guarded, READ-ONLY (no writes); remove after diagnosis.
-Route::get('/debug/diag', function (\Illuminate\Http\Request $request) {
-    abort_unless($request->query('key') === 'hrpro-diag-9271', 404);
-
-    $out = [
-        'app_env' => app()->environment(),
-        'php_intl' => extension_loaded('intl'),
-        'faker_locale' => config('app.faker_locale'),
-        'db_connection' => config('database.default'),
-        'db_database_cfg' => config('database.connections.sqlite.database'),
-        'counts' => [
-            'users' => \App\Models\User::count(),
-            'employees' => \App\Models\Employee::count(),
-            'departments' => \App\Models\Department::count(),
-            'leave_requests' => \App\Models\LeaveRequest::count(),
-            'payrolls' => \Illuminate\Support\Facades\Schema::hasTable('payrolls') ? \App\Models\Payroll::count() : 'no-table',
-        ],
-    ];
-
-    // Non-destructive: build (do NOT save) a factory model to test seeding deps.
-    try {
-        $e = \App\Models\Employee::factory()->make();
-        $out['factory_make'] = 'ok: '.$e->first_name.' '.$e->last_name.' <'.$e->email.'>';
-    } catch (\Throwable $ex) {
-        $out['factory_error'] = $ex->getMessage();
-        $out['factory_where'] = basename($ex->getFile()).':'.$ex->getLine();
-    }
-
-    return response()->json($out, 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-});
-
 /*
 |--------------------------------------------------------------------------
 | Authenticated application routes
