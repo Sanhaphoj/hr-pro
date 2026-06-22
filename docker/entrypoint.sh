@@ -1,6 +1,8 @@
 #!/usr/bin/env sh
 # ---------------------------------------------------------------------------
-# HR PRO container startup: prepare app, migrate, seed demo data once, serve.
+# HR PRO container startup: prepare app, migrate, seed once, serve.
+# Seeding always creates roles/permissions + one admin account; the full demo
+# dataset is loaded only when SEED_DEMO=true (see DatabaseSeeder).
 # ---------------------------------------------------------------------------
 set -e
 cd /var/www/html
@@ -21,14 +23,14 @@ mkdir -p database \
     storage/logs
 [ -f database/database.sqlite ] || touch database/database.sqlite
 
-# Schema + demo data (seed only once per container filesystem).
+# Schema + seed (seed only once per container filesystem).
 php artisan migrate --force
 if [ ! -f storage/.seeded ]; then
     if php artisan db:seed --force; then
         touch storage/.seeded
-        echo "HR PRO: demo data seeded successfully."
+        echo "HR PRO: database seeded successfully (SEED_DEMO=${SEED_DEMO:-false})."
     else
-        echo "HR PRO: WARNING — demo data seeding failed (see errors above); the app will still start."
+        echo "HR PRO: WARNING — seeding failed (see errors above); the app will still start."
     fi
 fi
 

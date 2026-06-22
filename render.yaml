@@ -27,6 +27,11 @@ services:
       # (e.g. https://hr-pro.onrender.com) for correct absolute links.
       - key: APP_URL
         sync: false
+      # Load the full demo dataset on first boot. Leave unset for a clean
+      # install (roles/permissions + one admin account only). Set this to
+      # "true" in the Render dashboard to populate the public live demo.
+      - key: SEED_DEMO
+        sync: false
       - key: DB_CONNECTION
         value: sqlite
       - key: SESSION_DRIVER
