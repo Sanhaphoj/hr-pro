@@ -97,13 +97,17 @@ class DemoDataSeeder extends Seeder
         ];
         $demoUsers = [];
         foreach ($accounts as [$name, $email, $slug]) {
-            $user = User::create([
-                'name' => $name,
-                'email' => $email,
-                'password' => Hash::make('password'),
-                'is_active' => true,
-                'email_verified_at' => now(),
-            ]);
+            // firstOrCreate keeps this safe when AdminUserSeeder already
+            // created the admin account before demo data is loaded.
+            $user = User::firstOrCreate(
+                ['email' => $email],
+                [
+                    'name' => $name,
+                    'password' => Hash::make('password'),
+                    'is_active' => true,
+                    'email_verified_at' => now(),
+                ],
+            );
             $user->roles()->sync([$roles[$slug]]);
             $demoUsers[$slug] = $user;
         }

@@ -133,8 +133,12 @@ php artisan key:generate
 # 2) สร้างฐานข้อมูลใน MySQL แล้วแก้ค่า DB_* ใน .env
 #    CREATE DATABASE hr_pro CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-# 3) สร้างตารางและใส่ข้อมูลตัวอย่าง (บัญชีทดลอง + พนักงาน 47 คน)
+# 3) สร้างตาราง + ข้อมูลเริ่มต้น (บทบาท/สิทธิ์ + บัญชี admin 1 บัญชี)
 php artisan migrate --seed
+
+#    ต้องการข้อมูลตัวอย่างเต็ม (พนักงาน 47 คน, การลา, เงินเดือน ฯลฯ) ให้ตั้ง
+#    SEED_DEMO=true ใน .env ก่อนรัน seed:
+# SEED_DEMO=true php artisan migrate --seed
 
 # 4) ลิงก์ที่เก็บไฟล์แนบ (รูปพนักงาน / ไฟล์แนบใบลา)
 php artisan storage:link
@@ -143,11 +147,18 @@ php artisan storage:link
 php artisan serve
 ```
 
-เปิดเบราว์เซอร์ที่ **http://localhost:8000** แล้วเข้าสู่ระบบ:
+เปิดเบราว์เซอร์ที่ **http://localhost:8000** แล้วเข้าสู่ระบบ
+
+บัญชีเริ่มต้น (มีเสมอในทุกการติดตั้ง — ปรับได้ผ่าน `ADMIN_EMAIL` / `ADMIN_PASSWORD` ใน `.env`):
 
 | บทบาท | อีเมล | รหัสผ่าน |
 |---|---|---|
 | ผู้ดูแลระบบ (Super Admin) | `admin@hrpro.local` | `password` |
+
+บัญชีทดลองเพิ่มเติมด้านล่างจะมีเฉพาะเมื่อ seed ด้วย `SEED_DEMO=true` เท่านั้น:
+
+| บทบาท | อีเมล | รหัสผ่าน |
+|---|---|---|
 | ฝ่ายบุคคล (HR Manager) | `hr@hrpro.local` | `password` |
 | หัวหน้างาน (Manager) | `manager@hrpro.local` | `password` |
 | พนักงาน (Employee) | `employee@hrpro.local` | `password` |
