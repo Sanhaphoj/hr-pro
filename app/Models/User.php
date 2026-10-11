@@ -19,7 +19,39 @@ class User extends Authenticatable
         'password',
         'is_active',
         'last_login_at',
+        'theme',
+        'color_scheme',
     ];
+
+    /** Accent themes offered on the appearance screen. */
+    public const THEMES = ['teal', 'indigo', 'navy', 'emerald', 'plum'];
+
+    /** Light, dark, or follow the operating system. */
+    public const COLOR_SCHEMES = ['light', 'dark', 'auto'];
+
+    /**
+     * Mirrors the column defaults so a freshly built model already knows its
+     * appearance — the database default only lands after a round trip.
+     */
+    protected $attributes = [
+        'theme' => 'teal',
+        'color_scheme' => 'light',
+    ];
+
+    /**
+     * A new account starts on the default look from Settings → System rather
+     * than the hard-wired teal.
+     */
+    public function __construct(array $attributes = [])
+    {
+        $theme = config('hrpro.appearance.theme', 'teal');
+        $scheme = config('hrpro.appearance.color_scheme', 'light');
+
+        $this->attributes['theme'] = in_array($theme, self::THEMES, true) ? $theme : 'teal';
+        $this->attributes['color_scheme'] = in_array($scheme, self::COLOR_SCHEMES, true) ? $scheme : 'light';
+
+        parent::__construct($attributes);
+    }
 
     protected $hidden = [
         'password',
@@ -33,6 +65,7 @@ class User extends Authenticatable
             'last_login_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'must_change_password' => 'boolean',
         ];
     }
 
@@ -68,6 +101,20 @@ class User extends Authenticatable
     /**
      * Flat list of every permission name granted through the user's roles.
      */
+    /**
+     * Whether this account must take a front-camera photo to punch in or out.
+     *
+     * Read from the permissions actually attached to its roles rather than
+     * through hasPermission(), which waves a super-admin through everything —
+     * for a requirement that would mean "always forced" instead of "allowed".
+     *
+     * @param  'in'|'out'  $action
+     */
+    public function requiresSelfie(string $action): bool
+    {
+        return in_array('attendance.selfie-'.$action, $this->permissionNames(), true);
+    }
+
     public function permissionNames(): array
     {
         $this->loadMissing('roles.permissions');

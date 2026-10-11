@@ -12,7 +12,9 @@ return [
 
     'leave_time' => 'Leave & Time',
     'my_leave' => 'My Leave',
-    'attendance' => 'Attendance',
+    'time_clock' => 'Time Clock',
+    'attendance' => 'Attendance History',
+    'work_locations' => 'Work Locations',
     'leave_approvals' => 'Leave Approvals',
     'leave_types' => 'Leave Types',
 
@@ -33,5 +35,7 @@ return [
     'roles' => 'Roles & Permissions',
     'audit_logs' => 'Audit Log',
 
+    'appearance' => 'Appearance',
+    'settings' => 'Settings',
     'language' => 'Language',
 ];

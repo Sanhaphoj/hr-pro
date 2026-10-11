@@ -25,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'permission' => \App\Http\Middleware\EnsureUserHasPermission::class,
             'active' => \App\Http\Middleware\EnsureUserIsActive::class,
+            'password.changed' => \App\Http\Middleware\EnsurePasswordIsChanged::class,
         ]);
 
         // Always redirect guests to the login route.

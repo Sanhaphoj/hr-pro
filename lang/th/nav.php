@@ -12,7 +12,9 @@ return [
 
     'leave_time' => 'การลา & เวลางาน',
     'my_leave' => 'การลาของฉัน',
-    'attendance' => 'ลงเวลาทำงาน',
+    'time_clock' => 'ลงเวลาเข้า–ออก',
+    'attendance' => 'ประวัติการลงเวลา',
+    'work_locations' => 'บริเวณลงเวลา',
     'leave_approvals' => 'อนุมัติการลา',
     'leave_types' => 'ประเภทการลา',
 
@@ -33,5 +35,7 @@ return [
     'roles' => 'บทบาท & สิทธิ์',
     'audit_logs' => 'บันทึกการใช้งาน',
 
+    'appearance' => 'การแสดงผล',
+    'settings' => 'ตั้งค่า',
     'language' => 'ภาษา',
 ];

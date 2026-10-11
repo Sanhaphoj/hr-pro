@@ -9,6 +9,13 @@ use Illuminate\Database\Seeder;
 class RolePermissionSeeder extends Seeder
 {
     /**
+     * Permissions that impose a requirement rather than grant an ability.
+     * They are kept out of the super-admin "everything" set, so ticking
+     * them stays a deliberate choice for every role, super-admin included.
+     */
+    public const REQUIREMENTS = ['attendance.selfie-in', 'attendance.selfie-out'];
+
+    /**
      * Canonical permission catalogue. The `name` values here are the single
      * source of truth referenced by controller middleware and Blade @can.
      *
@@ -42,6 +49,15 @@ class RolePermissionSeeder extends Seeder
             ['leave-approvals.approve', 'leave-approvals', 'อนุมัติ/ปฏิเสธคำขอลา'],
 
             ['attendance.viewAll', 'attendance', 'ดูการลงเวลาของพนักงานทุกคน'],
+            // Ticking one makes that role photograph itself with the front
+            // camera at the punch. Off for every role until an admin opts in.
+            ['attendance.selfie-in', 'attendance', 'บังคับถ่ายภาพหน้าตอนเข้างาน'],
+            ['attendance.selfie-out', 'attendance', 'บังคับถ่ายภาพหน้าตอนออกงาน'],
+
+            ['work-locations.view', 'work-locations', 'ดูบริเวณสำหรับลงเวลา'],
+            ['work-locations.create', 'work-locations', 'เพิ่มบริเวณสำหรับลงเวลา'],
+            ['work-locations.update', 'work-locations', 'แก้ไขบริเวณสำหรับลงเวลา'],
+            ['work-locations.delete', 'work-locations', 'ลบบริเวณสำหรับลงเวลา'],
 
             ['announcements.manage', 'announcements', 'จัดการประกาศ (เพิ่ม/แก้ไข/ลบ)'],
 
@@ -62,6 +78,16 @@ class RolePermissionSeeder extends Seeder
 
             ['documents.view', 'documents', 'ดูคลังเอกสาร'],
             ['documents.manage', 'documents', 'จัดการคลังเอกสาร'],
+
+            // One per group on the settings screen (App\Support\SettingsCatalogue).
+            ['settings.company', 'settings', 'ตั้งค่าข้อมูลบริษัทและหัวกระดาษเอกสาร'],
+            ['settings.attendance', 'settings', 'ตั้งค่าเวลาทำงานและการลงเวลา'],
+            ['settings.leave', 'settings', 'ตั้งค่าการลา'],
+            ['settings.payroll', 'settings', 'ตั้งค่าการคำนวณเงินเดือน'],
+            ['settings.documents', 'settings', 'ตั้งค่าคลังเอกสาร'],
+            ['settings.notifications', 'settings', 'ตั้งค่าการแจ้งเตือนและอีเมล'],
+            ['settings.security', 'settings', 'ตั้งค่าความปลอดภัยและรหัสผ่าน'],
+            ['settings.system', 'settings', 'ตั้งค่าระบบ'],
 
             ['users.view', 'users', 'ดูผู้ใช้งานระบบ'],
             ['users.create', 'users', 'เพิ่มผู้ใช้งานระบบ'],
@@ -87,17 +113,25 @@ class RolePermissionSeeder extends Seeder
             'positions.view', 'positions.create', 'positions.update', 'positions.delete',
             'leave-types.view', 'leave-types.create', 'leave-types.update', 'leave-types.delete',
             'leave-requests.viewAll', 'leave-approvals.view', 'leave-approvals.approve',
-            'attendance.viewAll', 'announcements.manage', 'reports.view', 'audit-logs.view',
+            'attendance.viewAll',
+            'work-locations.view', 'work-locations.create', 'work-locations.update', 'work-locations.delete',
+            'announcements.manage', 'reports.view', 'audit-logs.view',
             'payroll.view', 'payroll.manage',
             'recruitment.view', 'recruitment.manage',
             'performance.view', 'performance.manage',
             'training.view', 'training.manage',
             'documents.view', 'documents.manage',
+            // HR runs the organisation's day-to-day rules; security, email and
+            // system-wide settings stay with the super-admin.
+            'settings.company', 'settings.attendance', 'settings.leave', 'settings.payroll', 'settings.documents',
         ];
 
+        // A supervisor approves leave and reads aggregate reports, but the
+        // attendance log itself is personal data: only the administrator tier
+        // (super-admin, and HR who runs payroll from it) reads everyone's.
         $manager = [
             'employees.view', 'leave-requests.viewAll', 'leave-approvals.view',
-            'leave-approvals.approve', 'attendance.viewAll', 'reports.view',
+            'leave-approvals.approve', 'work-locations.view', 'reports.view',
             'performance.view', 'training.view', 'recruitment.view',
         ];
 
@@ -115,7 +149,7 @@ class RolePermissionSeeder extends Seeder
             );
 
             $ids = $perms === '*'
-                ? Permission::pluck('id')->all()
+                ? Permission::whereNotIn('name', self::REQUIREMENTS)->pluck('id')->all()
                 : Permission::whereIn('name', $perms)->pluck('id')->all();
 
             $role->syncPermissions($ids);
