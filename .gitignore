@@ -27,3 +27,6 @@ yarn-error.log
 /database/*.sqlite-journal
 /storage/.seeded
 /serve.log
+/public/uploads
+/promo-screenshots
+/dist

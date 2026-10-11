@@ -6,6 +6,12 @@
             "runtimeExecutable": "php",
             "runtimeArgs": ["artisan", "serve", "--host=127.0.0.1", "--port=8001"],
             "port": 8001
+        },
+        {
+            "name": "deck",
+            "runtimeExecutable": "php",
+            "runtimeArgs": ["-S", "127.0.0.1:8910", "-t", "presentation"],
+            "port": 8910
         }
     ]
 }

@@ -22,7 +22,7 @@ WORKDIR /var/www/html
 # Sensible production defaults. These are real environment variables, so they
 # take precedence over .env and make the container self-contained (works with a
 # plain `docker run` too). Override any of them on your host's dashboard.
-ENV APP_NAME="HR PRO" \
+ENV APP_NAME="HR PRO V.2" \
     APP_ENV=production \
     APP_DEBUG=false \
     APP_TIMEZONE=Asia/Bangkok \

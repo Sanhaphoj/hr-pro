@@ -24,7 +24,8 @@
 | **Employees** | ทะเบียนประวัติพนักงาน (CRUD), ค้นหา/กรองตามแผนก-สถานะ, แบ่งหน้า, หน้าโปรไฟล์พร้อมยอดวันลา |
 | **Departments & Positions** | โครงสร้างองค์กร แผนก/ตำแหน่งงาน พร้อมหัวหน้าแผนกและลำดับขั้น |
 | **Leave Management** | ประเภทการลา, ยื่นคำขอลา (ตัดวันทำงานอัตโนมัติ), สายอนุมัติ, ยอดวันลาคงเหลือ (entitled/used/pending) |
-| **Attendance** | ลงเวลาเข้า–ออกงาน, ตรวจจับการมาสายตามเวลาทำงาน, ประวัติการลงเวลา |
+| **Attendance** | หน้าลงเวลาเข้า–ออกงานแยกเฉพาะ (ตรวจตำแหน่ง GPS เทียบบริเวณที่อนุญาต), แจ้งเตือนพร้อมช่องกรอกเหตุผล (ไม่บังคับ) เมื่อเข้าสายหรือออกก่อนเวลา, ประวัติการลงเวลาพร้อมสถานที่และเหตุผล |
+| **Work Locations** | ผู้ดูแลระบบกำหนดบริเวณ (จุดศูนย์กลาง + รัศมี) ที่พนักงานลงเวลาได้ พร้อมเปิด/ปิดการบังคับตรวจตำแหน่ง |
 | **Announcements** | ประกาศข่าวสารองค์กร พร้อมหมวดหมู่/ปักหมุด/สถานะเผยแพร่ |
 | **Settings (Admin)** | จัดการผู้ใช้งานระบบ และบทบาท/สิทธิ์ (กำหนดสิทธิ์ราย permission) |
 | **Reports & Audit** | รายงานสถิติกำลังพล/การลา/การลงเวลา และบันทึกการใช้งานระบบ (Audit Log) |
@@ -97,7 +98,8 @@ HR PRO/
 | `leave_types` | name, code*, days_per_year, requires_approval, is_paid | unique(code) | leave_requests, balances |
 | `leave_requests` | employee_id, leave_type_id, start/end_date, total_days, status, approver_id | idx(status, employee+status, start_date), softDeletes | employee, leaveType, approver |
 | `leave_balances` | employee_id, leave_type_id, year, entitled/used/pending_days | unique(employee+type+year) | employee, leaveType |
-| `attendances` | employee_id, work_date, clock_in/out, worked_minutes, status | unique(employee+work_date), idx(work_date) | employee |
+| `attendances` | employee_id, work_date, clock_in/out (+location_id, lat/lng, accuracy, distance), worked_minutes, status, late_reason, left_early, early_leave_reason | unique(employee+work_date), idx(work_date) | employee, clockIn/OutLocation |
+| `work_locations` | name, code*, address, latitude, longitude, radius_meters, is_active | unique(code), idx(is_active) | attendances |
 | `announcements` | title, body, category, is_published, pinned, author_id | idx(published_at), softDeletes | author |
 | `audit_logs` | user_id, action, auditable_type/id, description, ip | idx(action, auditable) | user |
 | `notifications` | user_id, type, title, message, read_at | idx(user+read_at) | user |
@@ -121,6 +123,10 @@ HR PRO/
 ---
 
 ## 🚀 การติดตั้ง & รัน (5 ขั้นตอน)
+
+> **แจกจ่ายให้ผู้ใช้ทั่วไป:** `pwsh release/build.ps1` สร้าง `dist/HR-PRO-V2-<วันที่>.zip`
+> ที่มี vendor พร้อม, คู่มือภาษาไทย `START-HERE.html` และตัวติดตั้งแบบดับเบิลคลิก (SQLite, ต้องมีแค่ PHP)
+> ไฟล์ต้นทางของชุดแจกอยู่ใน [`release/kit/`](release/kit)
 
 ต้องมี **PHP ≥ 8.2**, **Composer**, **MySQL ≥ 8** (หรือ MariaDB ≥ 10.6)
 
@@ -149,7 +155,8 @@ php artisan serve
 
 เปิดเบราว์เซอร์ที่ **http://localhost:8000** แล้วเข้าสู่ระบบ
 
-บัญชีเริ่มต้น (มีเสมอในทุกการติดตั้ง — ปรับได้ผ่าน `ADMIN_EMAIL` / `ADMIN_PASSWORD` ใน `.env`):
+บัญชีเริ่มต้น (มีเสมอในทุกการติดตั้ง — ปรับได้ผ่าน `ADMIN_EMAIL` / `ADMIN_PASSWORD` ใน `.env`)
+บนเครื่อง local หน้าเข้าสู่ระบบจะแสดงกล่อง **บัญชีทดลอง** ให้คลิกกรอกอัตโนมัติ (หายไปเองเมื่อเปลี่ยนรหัสผ่าน):
 
 | บทบาท | อีเมล | รหัสผ่าน |
 |---|---|---|
@@ -174,9 +181,11 @@ php artisan test
 ```
 
 - **Unit** — `LeaveServiceTest` (คำนวณวันทำงาน, ตัด/คืนยอดวันลา, ตรวจการลาทับซ้อน, ลาเกินสิทธิ์, auto-approve),
-  `AttendanceServiceTest` (มาตรงเวลา/มาสาย, ลงเวลาซ้ำ, คำนวณชั่วโมงทำงาน)
+  `AttendanceServiceTest` (มาตรงเวลา/มาสาย, ลงเวลาซ้ำ, คำนวณชั่วโมงทำงาน, เหตุผลสาย/ออกก่อนเวลา, สรุปยอดรายวัน),
+  `GeofenceServiceTest` (ระยะทาง haversine, จับคู่บริเวณ, ข้ามบริเวณที่ปิดใช้งาน)
 - **Feature** — `AuthTest` (เข้าสู่ระบบ/ออกจากระบบ), `LeaveRequestFlowTest` (e2e: เข้าสู่ระบบ → ยื่นใบลา → อนุมัติ → ยอดวันลาอัปเดต),
-  `EmployeeManagementTest` (CRUD พนักงานพร้อมตรวจสิทธิ์)
+  `EmployeeManagementTest` (CRUD พนักงานพร้อมตรวจสิทธิ์),
+  `TimeClockTest` (ลงเวลาในบริเวณ/นอกบริเวณ, ไม่ส่งพิกัด, สัญญาณไม่แม่นยำ, สิทธิ์จัดการบริเวณ)
 
 ---
 
@@ -202,7 +211,8 @@ php artisan test
 2. กด **New +** → **Blueprint** → เลือก repo `Sanhaphoj/hr-pro` (Render จะอ่าน [`render.yaml`](render.yaml) ให้อัตโนมัติ)
 3. กด **Apply** → รอ build เสร็จ (~3–5 นาที) จะได้ URL เช่น `https://hr-pro.onrender.com`
 4. (ถ้าต้องการ) ตั้ง `APP_URL` ใน Render = URL ที่ได้ เพื่อให้ลิงก์สมบูรณ์
-5. เปิด URL → เข้าสู่ระบบด้วยบัญชีทดลอง (`admin@hrpro.local` / `password`)
+5. เปิด URL → ถ้าตั้ง `SEED_DEMO=true` (เว็บเดโม) เข้าด้วยบัญชีทดลอง (`admin@hrpro.local` / `password`);
+   ถ้าไม่ได้ตั้ง ให้ดูรหัสผ่านสุ่มของผู้ดูแลระบบใน **deploy log** (ดูหัวข้อถัดไป)
 
 ไฟล์ที่เกี่ยวข้อง: [`Dockerfile`](Dockerfile) · [`docker/entrypoint.sh`](docker/entrypoint.sh) · [`render.yaml`](render.yaml)
 ข้อจำกัด Free tier: เซิร์ฟเวอร์จะ "หลับ" หลังไม่มีคนใช้ ~15 นาที และตื่นใหม่ ~30–60 วินาทีในคำขอแรก; ข้อมูลตัวอย่างจะถูก seed ใหม่เมื่อ redeploy (เหมาะกับเดโม)
@@ -213,6 +223,11 @@ php artisan test
 - **เป้าหมาย**: เซิร์ฟเวอร์ที่มี PHP 8.2+ (Nginx/Apache + PHP-FPM) หรือ Laravel Forge/Cloud
 - **Build/optimize**: `composer install --no-dev --optimize-autoloader && php artisan config:cache route:cache view:cache`
 - **Migration**: `php artisan migrate --force`
+- **บัญชีผู้ดูแลระบบบน production** (`APP_ENV=production` และไม่ได้ตั้ง `SEED_DEMO`) ทำงานต่างจาก local:
+  - `migrate --seed` สุ่มรหัสผ่าน 16 ตัวอักษรให้ `ADMIN_EMAIL` แล้วแสดง **ครั้งเดียว** ใน terminal / deploy log
+    (หรือใช้ `ADMIN_PASSWORD` ถ้าตั้งไว้และไม่ใช่ `password`)
+  - เข้าสู่ระบบครั้งแรกถูก **บังคับตั้งรหัสผ่านใหม่** (`must_change_password`) และหน้าเข้าสู่ระบบไม่แสดงบัญชีทดลอง
+  - ลืม/ไม่ทันเห็นรหัส: `php artisan hrpro:admin-password [email]` ออกรหัสชั่วคราวใหม่
 - **ENV ที่ต้องตั้ง (ตามลำดับ)**: `APP_KEY` → `APP_ENV=production` `APP_DEBUG=false` → `DB_*` → `SESSION_SECURE_COOKIE=true` (หลัง HTTPS) → `MAIL_*` (ถ้าใช้อีเมล)
 - เปลี่ยน document root ไปที่โฟลเดอร์ `public/` (สำหรับ production จริงแนะนำ Nginx + PHP-FPM แทน `php artisan serve`)
 

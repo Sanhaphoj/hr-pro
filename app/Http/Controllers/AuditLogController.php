@@ -37,6 +37,7 @@ class AuditLogController extends Controller implements HasMiddleware
             'deleted' => 'ลบ',
             'approved' => 'อนุมัติ',
             'rejected' => 'ไม่อนุมัติ',
+            'printed' => 'พิมพ์เอกสาร',
             'login' => 'เข้าสู่ระบบ',
             'logout' => 'ออกจากระบบ',
         ];
