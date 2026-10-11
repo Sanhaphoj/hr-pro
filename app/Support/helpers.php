@@ -252,3 +252,22 @@ if (! function_exists('brand_asset')) {
         return $path && is_file(public_path($path)) ? asset_v($path) : null;
     }
 }
+
+if (! function_exists('doc_src')) {
+    /**
+     * An image on a printed document: its URL on screen, and the file itself
+     * as a data: URI when the document is being made into a PDF, because
+     * Chrome renders that from a local copy and may not reach the site.
+     */
+    function doc_src(?string $url, ?string $file): ?string
+    {
+        if ($url === null) {
+            return null;
+        }
+        if (! view()->shared('pdfMode') || ! $file || ! is_file($file) || filesize($file) > 2 * 1024 * 1024) {
+            return $url;
+        }
+
+        return 'data:'.(mime_content_type($file) ?: 'image/png').';base64,'.base64_encode((string) file_get_contents($file));
+    }
+}

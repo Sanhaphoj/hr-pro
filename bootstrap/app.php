@@ -26,6 +26,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \App\Http\Middleware\EnsureUserHasPermission::class,
             'active' => \App\Http\Middleware\EnsureUserIsActive::class,
             'password.changed' => \App\Http\Middleware\EnsurePasswordIsChanged::class,
+            // ?download=pdf on a printable document returns it as a PDF file.
+            'pdf' => \App\Http\Middleware\RenderPdf::class,
         ]);
 
         // Always redirect guests to the login route.

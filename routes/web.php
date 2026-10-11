@@ -87,9 +87,9 @@ Route::middleware(['auth', 'active', 'password.changed'])->group(function () {
     // --- People management ---
     // Printable documents come first: `/employees/print` would otherwise be
     // read as an employee id by the resource's show route.
-    Route::get('/employees/print', [EmployeeController::class, 'printList'])->name('employees.print-list');
-    Route::get('/employees/{employee}/print', [EmployeeController::class, 'print'])->name('employees.print');
-    Route::get('/employees/{employee}/certificate', [EmployeeController::class, 'certificate'])->name('employees.certificate');
+    Route::get('/employees/print', [EmployeeController::class, 'printList'])->name('employees.print-list')->middleware('pdf');
+    Route::get('/employees/{employee}/print', [EmployeeController::class, 'print'])->name('employees.print')->middleware('pdf');
+    Route::get('/employees/{employee}/certificate', [EmployeeController::class, 'certificate'])->name('employees.certificate')->middleware('pdf');
     Route::resource('employees', EmployeeController::class);
     Route::resource('departments', DepartmentController::class)->except('show');
     Route::resource('positions', PositionController::class)->except('show');
@@ -108,7 +108,7 @@ Route::middleware(['auth', 'active', 'password.changed'])->group(function () {
     Route::post('/leave-requests/{leaveRequest}/cancel', [LeaveRequestController::class, 'cancel'])
         ->name('leave-requests.cancel');
     Route::get('/leave-requests/{leaveRequest}/print', [LeaveRequestController::class, 'print'])
-        ->name('leave-requests.print');
+        ->name('leave-requests.print')->middleware('pdf');
 
     // Who is away this month: department colleagues for everyone, the whole
     // organisation for roles that read every request.
@@ -127,7 +127,7 @@ Route::middleware(['auth', 'active', 'password.changed'])->group(function () {
     // --- Attendance ---
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
     // A monthly timesheet for one person, or (with ?date=) the day's register.
-    Route::get('/attendance/print', [AttendanceController::class, 'print'])->name('attendance.print');
+    Route::get('/attendance/print', [AttendanceController::class, 'print'])->name('attendance.print')->middleware('pdf');
 
     // Clocking in/out has its own screen so the browser can obtain a GPS fix
     // and the punch can be checked against the approved work locations.
@@ -145,7 +145,7 @@ Route::middleware(['auth', 'active', 'password.changed'])->group(function () {
 
     // --- Communication ---
     Route::resource('announcements', AnnouncementController::class);
-    Route::get('/announcements/{announcement}/print', [AnnouncementController::class, 'print'])->name('announcements.print');
+    Route::get('/announcements/{announcement}/print', [AnnouncementController::class, 'print'])->name('announcements.print')->middleware('pdf');
 
     // --- Insight ---
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
@@ -154,15 +154,15 @@ Route::middleware(['auth', 'active', 'password.changed'])->group(function () {
     // --- HR Operations (Phase 2) ---
     Route::get('/payroll', [PayrollController::class, 'index'])->name('payroll.index');
     Route::post('/payroll/generate', [PayrollController::class, 'generate'])->name('payroll.generate');
-    Route::get('/payroll/print', [PayrollController::class, 'printRegister'])->name('payroll.print-register');
+    Route::get('/payroll/print', [PayrollController::class, 'printRegister'])->name('payroll.print-register')->middleware('pdf');
     Route::get('/payroll/{payroll}', [PayrollController::class, 'show'])->name('payroll.show');
-    Route::get('/payroll/{payroll}/print', [PayrollController::class, 'printSlip'])->name('payroll.print');
+    Route::get('/payroll/{payroll}/print', [PayrollController::class, 'printSlip'])->name('payroll.print')->middleware('pdf');
     Route::put('/payroll/{payroll}', [PayrollController::class, 'update'])->name('payroll.update');
     Route::post('/payroll/{payroll}/finalize', [PayrollController::class, 'finalize'])->name('payroll.finalize');
 
     // Self-service: one's own confirmed payslips, no payroll permission needed.
     Route::get('/my/payslips', [MyPayslipController::class, 'index'])->name('my-payslips.index');
-    Route::get('/my/payslips/{payroll}', [MyPayslipController::class, 'print'])->name('my-payslips.print');
+    Route::get('/my/payslips/{payroll}', [MyPayslipController::class, 'print'])->name('my-payslips.print')->middleware('pdf');
 
     Route::get('/recruitment', [JobPostingController::class, 'index'])->name('recruitment.index');
     Route::get('/recruitment/create', [JobPostingController::class, 'create'])->name('recruitment.create');
@@ -173,13 +173,13 @@ Route::middleware(['auth', 'active', 'password.changed'])->group(function () {
     Route::put('/recruitment/{recruitment}/candidates/{candidate}', [JobPostingController::class, 'updateCandidate'])->name('recruitment.candidates.update');
 
     Route::resource('performance', PerformanceReviewController::class)->only(['index', 'create', 'store', 'show', 'destroy']);
-    Route::get('/performance/{performance}/print', [PerformanceReviewController::class, 'print'])->name('performance.print');
+    Route::get('/performance/{performance}/print', [PerformanceReviewController::class, 'print'])->name('performance.print')->middleware('pdf');
 
     Route::get('/training', [TrainingController::class, 'index'])->name('training.index');
     Route::get('/training/create', [TrainingController::class, 'create'])->name('training.create');
     Route::post('/training', [TrainingController::class, 'store'])->name('training.store');
     Route::get('/training/{training}', [TrainingController::class, 'show'])->name('training.show');
-    Route::get('/training/{training}/print', [TrainingController::class, 'print'])->name('training.print');
+    Route::get('/training/{training}/print', [TrainingController::class, 'print'])->name('training.print')->middleware('pdf');
     Route::delete('/training/{training}', [TrainingController::class, 'destroy'])->name('training.destroy');
     Route::post('/training/{training}/enroll', [TrainingController::class, 'enroll'])->name('training.enroll');
     Route::post('/training/{training}/enrollments/{enrollment}/complete', [TrainingController::class, 'complete'])->name('training.complete');

@@ -3,8 +3,9 @@
     $company = config('hrpro.company', []);
     $name = $company['name'] ?? config('hrpro.company_name');
     // The company's own logo; failing that, the system logo when Settings → Logo allows it.
-    $logo = brand_asset($company['logo'] ?? null)
-        ?? (config('hrpro.branding.use_on_documents', true) ? brand_asset(config('hrpro.branding.logo')) : null);
+    $logoPath = brand_asset($company['logo'] ?? null) ? $company['logo']
+        : (config('hrpro.branding.use_on_documents', true) && brand_asset(config('hrpro.branding.logo')) ? config('hrpro.branding.logo') : null);
+    $logo = $logoPath ? doc_src(brand_asset($logoPath), public_path($logoPath)) : null;
     // Without a logo image, the first two letters of the name stand in for one.
     $mark = \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr(preg_replace('/[^\pL\pN]/u', '', (string) $name), 0, 2));
     $contact = array_filter([

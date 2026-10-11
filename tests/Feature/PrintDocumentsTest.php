@@ -216,7 +216,9 @@ class PrintDocumentsTest extends TestCase
             ->assertSee('สี่หมื่นห้าพันบาทถ้วน')
             ->assertSee('เพื่อประกอบการขอสินเชื่อ')
             ->assertDontSee('เพื่อเพื่อ')
-            ->assertDontSee('<script>', false);
+            // The typed purpose is escaped, not run.
+            ->assertDontSee('ขอสินเชื่อ<script>', false)
+            ->assertSee('ขอสินเชื่อ&lt;script&gt;', false);
 
         $employeeUser = $this->user('employee');
         $this->actingAs($employeeUser)->get(route('employees.print', $employee))->assertForbidden();

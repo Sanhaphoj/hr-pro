@@ -76,7 +76,9 @@ body {
     color: var(--doc-soft); font-weight: 600; text-decoration: none;
 }
 .doc-bar__back:hover { background: var(--doc-fill); color: var(--doc-ink); }
-.doc-bar__title { flex: 1 1 220px; min-width: 0; line-height: 1.3; }
+.doc-bar__title { flex: 1 1 160px; min-width: 0; line-height: 1.3; }
+/* Download and print travel together, at the right end of the bar. */
+.doc-bar__actions { display: flex; gap: 8px; margin-left: auto; }
 .doc-bar__title b { display: block; font-size: 15px; color: var(--doc-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .doc-bar__title small { display: block; font-size: 12px; color: var(--doc-muted); }
 .doc-bar__options,
@@ -369,8 +371,10 @@ select.doc-field { max-width: 240px; }
     .doc-bar__options { order: 3; width: 100%; }
     .doc-options { width: 100%; }
     .doc-options .doc-field { flex: 1 1 140px; width: auto; max-width: none; }
-    .doc-btn--primary span { display: none; }
-    .doc-btn--primary { width: 40px; padding: 0; }
+    .doc-btn--primary span,
+    [data-pdf-download] span { display: none; }
+    .doc-btn--primary,
+    [data-pdf-download] { width: 40px; padding: 0; }
 
     .doc-desk__sheets { padding: 10px 0 40px; }
     .sheet { margin-bottom: 0; padding: 20px 14px; box-shadow: none; }
@@ -407,3 +411,8 @@ select.doc-field { max-width: 240px; }
     .doc-table-wrap { overflow: visible; }
     a { color: inherit; text-decoration: none; }
 }
+
+
+/* ---------- PDF download ---------- */
+.doc-btn.is-busy { opacity: .6; pointer-events: none; }
+.doc-tip--error { color: var(--doc-danger); font-weight: 600; }

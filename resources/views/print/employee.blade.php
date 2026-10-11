@@ -24,7 +24,7 @@
         <div class="profile">
             <div class="profile__photo">
                 @if($employee->photo_url)
-                    <img src="{{ $employee->photo_url }}" alt="">
+                    <img src="{{ doc_src($employee->photo_url, \Illuminate\Support\Facades\Storage::disk('public')->path($employee->photo_path)) }}" alt="">
                 @else
                     {{ $employee->initials }}
                 @endif

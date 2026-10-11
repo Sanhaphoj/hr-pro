@@ -143,6 +143,14 @@ return [
         'model' => env('HRPRO_AI_MODEL', 'claude-opus-5-5'),
     ],
 
+    // "ดาวน์โหลด PDF" on printed documents, rendered by headless Chrome.
+    // Leave the path blank to look in the usual install locations; without
+    // Chrome the button is hidden and browser printing still works.
+    'pdf' => [
+        'enabled' => filter_var(env('HRPRO_PDF_ENABLED', true), FILTER_VALIDATE_BOOL),
+        'chrome_path' => env('HRPRO_CHROME_PATH'),
+    ],
+
     // Look of new accounts and of the sign-in screen.
     'appearance' => [
         'theme' => 'teal',
