@@ -9,6 +9,19 @@
     <div class="topbar__title">@yield('title', 'แดชบอร์ด')</div>
     <div class="topbar__spacer"></div>
 
+    <button type="button" class="topbar__search" data-cmdk-open aria-keyshortcuts="Control+K">
+        <x-icon name="search" />
+        <span>ค้นหา…</span>
+        <kbd>Ctrl K</kbd>
+    </button>
+
+    {{-- Flips straight away; the choice is saved in the background. --}}
+    <button type="button" class="topbar__icon" data-scheme-toggle data-url="{{ route('settings.appearance.scheme') }}"
+            aria-label="สลับโหมดมืด/สว่าง" title="สลับโหมดมืด/สว่าง">
+        <x-icon name="moon" class="scheme-icon scheme-icon--dark" />
+        <x-icon name="sun" class="scheme-icon scheme-icon--light" />
+    </button>
+
     <a href="{{ route('notifications.index') }}" class="topbar__icon" aria-label="การแจ้งเตือน" title="การแจ้งเตือน">
         <x-icon name="bell" />
         @if($unread > 0)<span class="dot"></span>@endif

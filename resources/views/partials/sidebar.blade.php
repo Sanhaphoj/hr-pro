@@ -28,6 +28,7 @@
 
         <div class="nav__group">{{ __('nav.leave_time') }}</div>
         <x-nav-link :href="route('leave-requests.index')" pattern="leave-requests.*" icon="calendar">{{ __('nav.my_leave') }}</x-nav-link>
+        <x-nav-link :href="route('leave-calendar.index')" pattern="leave-calendar.*" icon="grid">{{ __('nav.leave_calendar') }}</x-nav-link>
         <x-nav-link :href="route('time-clock.show')" pattern="time-clock.*" icon="map-pin">{{ __('nav.time_clock') }}</x-nav-link>
         <x-nav-link :href="route('attendance.index')" pattern="attendance.*" icon="clock">{{ __('nav.attendance') }}</x-nav-link>
         @can('work-locations.view')

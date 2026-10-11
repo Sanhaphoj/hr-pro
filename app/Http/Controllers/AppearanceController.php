@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -36,6 +37,21 @@ class AppearanceController extends Controller
         auth()->user()->forceFill($data)->save();
 
         return redirect()->route('settings.appearance.edit')->with('success', 'บันทึกการแสดงผลเรียบร้อยแล้ว');
+    }
+
+    /**
+     * The one-click light/dark switch in the top bar. The page has already
+     * flipped itself; this only remembers the choice for next time.
+     */
+    public function scheme(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'color_scheme' => ['required', Rule::in(User::COLOR_SCHEMES)],
+        ]);
+
+        auth()->user()->forceFill($data)->save();
+
+        return response()->json(['color_scheme' => $data['color_scheme']]);
     }
 
     /**

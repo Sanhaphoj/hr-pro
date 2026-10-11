@@ -12,6 +12,7 @@ return [
 
     'leave_time' => 'Leave & Time',
     'my_leave' => 'My Leave',
+    'leave_calendar' => 'Leave Calendar',
     'time_clock' => 'Time Clock',
     'attendance' => 'Attendance History',
     'work_locations' => 'Work Locations',

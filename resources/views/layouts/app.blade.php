@@ -51,6 +51,8 @@
         </div>
     </div>
 
+    @include('partials.command-palette')
+
     <script src="{{ asset_v('js/app.js') }}" defer></script>
     @stack('scripts')
 </body>

@@ -12,6 +12,7 @@ return [
 
     'leave_time' => 'การลา & เวลางาน',
     'my_leave' => 'การลาของฉัน',
+    'leave_calendar' => 'ปฏิทินวันลา',
     'time_clock' => 'ลงเวลาเข้า–ออก',
     'attendance' => 'ประวัติการลงเวลา',
     'work_locations' => 'บริเวณลงเวลา',

@@ -36,9 +36,14 @@ return Application::configure(basePath: dirname(__DIR__))
         // keeping JSON responses uniform for API/XHR clients.
         $exceptions->render(function (Throwable $e, Request $request) {
             if ($request->expectsJson()) {
-                $status = $e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface
-                    ? $e->getStatusCode()
-                    : 500;
+                $status = match (true) {
+                    $e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface => $e->getStatusCode(),
+                    $e instanceof \Illuminate\Validation\ValidationException => $e->status,
+                    $e instanceof \Illuminate\Auth\AuthenticationException => 401,
+                    $e instanceof \Illuminate\Auth\Access\AuthorizationException => 403,
+                    $e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException => 404,
+                    default => 500,
+                };
 
                 return response()->json([
                     'error' => [
@@ -49,7 +54,10 @@ return Application::configure(basePath: dirname(__DIR__))
                             $status === 404 => 'NOT_FOUND',
                             default => 'SERVER_ERROR',
                         },
-                        'message' => $e->getMessage() ?: 'An unexpected error occurred.',
+                        // A 500's own message can carry SQL or paths; only debug shows it.
+                        'message' => ($status >= 500 && ! config('app.debug')) || ! $e->getMessage()
+                            ? 'An unexpected error occurred.'
+                            : $e->getMessage(),
                         'details' => $e instanceof \Illuminate\Validation\ValidationException
                             ? $e->errors()
                             : null,

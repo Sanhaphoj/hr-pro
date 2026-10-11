@@ -20,6 +20,7 @@ use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LeaveApprovalController;
+use App\Http\Controllers\LeaveCalendarController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\LeaveTypeController;
 use App\Http\Controllers\NotificationController;
@@ -27,6 +28,7 @@ use App\Http\Controllers\OrgChartController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Settings\RoleController;
 use App\Http\Controllers\Settings\SystemSettingsController;
 use App\Http\Controllers\Settings\UserController;
@@ -101,6 +103,13 @@ Route::middleware(['auth', 'active', 'password.changed'])->group(function () {
         ->name('leave-requests.cancel');
     Route::get('/leave-requests/{leaveRequest}/print', [LeaveRequestController::class, 'print'])
         ->name('leave-requests.print');
+
+    // Who is away this month: department colleagues for everyone, the whole
+    // organisation for roles that read every request.
+    Route::get('/leave-calendar', [LeaveCalendarController::class, 'index'])->name('leave-calendar.index');
+
+    // Live record results for the Ctrl+K command palette.
+    Route::get('/search', SearchController::class)->name('search')->middleware('throttle:60,1');
 
     Route::get('/leave-approvals', [LeaveApprovalController::class, 'index'])->name('leave-approvals.index');
     Route::post('/leave-approvals/{leaveRequest}/approve', [LeaveApprovalController::class, 'approve'])->name('leave-approvals.approve');
@@ -193,6 +202,7 @@ Route::middleware(['auth', 'active', 'password.changed'])->group(function () {
         // Appearance is self-service: every account may set its own.
         Route::get('appearance', [AppearanceController::class, 'edit'])->name('appearance.edit');
         Route::put('appearance', [AppearanceController::class, 'update'])->name('appearance.update');
+        Route::patch('appearance/scheme', [AppearanceController::class, 'scheme'])->name('appearance.scheme');
 
         Route::resource('users', UserController::class);
         Route::resource('roles', RoleController::class);
