@@ -16,7 +16,7 @@ class PerformanceReviewController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:performance.view', only: ['index', 'show']),
+            new Middleware('permission:performance.view', only: ['index', 'show', 'print']),
             new Middleware('permission:performance.manage', only: ['create', 'store', 'destroy']),
         ];
     }
@@ -65,6 +65,18 @@ class PerformanceReviewController extends Controller implements HasMiddleware
         $performance->load(['employee.department', 'employee.position', 'reviewer']);
 
         return view('performance.show', ['review' => $performance]);
+    }
+
+    /**
+     * The review as a form for the employee and reviewers to sign.
+     */
+    public function print(PerformanceReview $performance): View
+    {
+        $performance->load(['employee.department', 'employee.position', 'reviewer']);
+
+        AuditLogger::log('printed', "พิมพ์ผลประเมินงวด {$performance->period}", $performance);
+
+        return view('print.performance', ['review' => $performance]);
     }
 
     public function destroy(PerformanceReview $performance): RedirectResponse

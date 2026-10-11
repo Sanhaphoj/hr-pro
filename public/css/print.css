@@ -1,0 +1,409 @@
+/* ==========================================================================
+   HR PRO — Printed documents
+   A4 paperwork: payslips, leave forms, certificates, registers, timesheets.
+   On screen each document lies on a desk as a sheet of paper with a toolbar
+   above it; on paper the desk and toolbar disappear and only the sheet prints.
+
+   Documents keep one formal palette whatever theme the person printing uses,
+   so a payslip looks the same whoever prints it. The single accent
+   (--doc-accent) is the company colour, set on <html> by layouts/print.
+   Sizes on the sheet are in millimetres so the screen preview and the paper
+   agree.
+   ========================================================================== */
+
+@page {
+    size: A4 portrait;
+    margin: 14mm 14mm 15mm;
+    @bottom-right { content: "หน้า " counter(page) " / " counter(pages); font-family: "Sarabun", sans-serif; font-size: 8pt; color: #7b8791; }
+}
+@page landscape {
+    size: A4 landscape;
+    margin: 11mm 12mm 13mm;
+    @bottom-right { content: "หน้า " counter(page) " / " counter(pages); font-family: "Sarabun", sans-serif; font-size: 8pt; color: #7b8791; }
+}
+
+:root {
+    --doc-accent: #0e8f88;
+    --doc-ink: #14232e;
+    --doc-text: #1d2a33;
+    --doc-soft: #4f5d67;
+    --doc-muted: #87939c;
+    --doc-line: #c9d2d9;
+    --doc-line-soft: #e2e7eb;
+    --doc-fill: #f2f5f7;
+    --doc-desk: #e4e9ed;
+    --doc-danger: #b42318;
+    /* Sarabun is the face Thai official correspondence is set in. */
+    --doc-font: "Sarabun", "TH Sarabun New", "Noto Sans Thai", Tahoma, sans-serif;
+    color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; padding: 0; }
+h1, h2, h3, h4, p { margin: 0; }
+b, strong { font-weight: 600; }
+
+body {
+    font-family: var(--doc-font);
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--doc-text);
+    background: #fff;
+    -webkit-font-smoothing: antialiased;
+    /* Table shading and the net-pay box are part of the document. */
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+@media screen {
+    body.doc-desk { background: var(--doc-desk); min-height: 100vh; }
+}
+
+/* ---------- Toolbar (screen only) ---------- */
+.doc-bar {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 10px clamp(12px, 3vw, 28px);
+    background: rgba(255, 255, 255, .95);
+    backdrop-filter: saturate(1.6) blur(10px);
+    border-bottom: 1px solid #d6dde2;
+    box-shadow: 0 1px 10px rgba(20, 35, 46, .06);
+}
+.doc-bar__back {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 13px 8px 9px; border-radius: 999px;
+    color: var(--doc-soft); font-weight: 600; text-decoration: none;
+}
+.doc-bar__back:hover { background: var(--doc-fill); color: var(--doc-ink); }
+.doc-bar__title { flex: 1 1 220px; min-width: 0; line-height: 1.3; }
+.doc-bar__title b { display: block; font-size: 15px; color: var(--doc-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.doc-bar__title small { display: block; font-size: 12px; color: var(--doc-muted); }
+.doc-bar__options,
+.doc-options { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0; }
+
+.doc-field {
+    height: 36px; min-width: 0; padding: 0 11px;
+    border: 1px solid var(--doc-line); border-radius: 9px; background: #fff;
+    font: inherit; font-size: 13.5px; color: var(--doc-text);
+}
+.doc-field:focus { outline: none; border-color: var(--doc-accent); box-shadow: 0 0 0 3px rgba(14, 143, 136, .18); }
+.doc-field--wide { width: min(300px, 70vw); }
+select.doc-field { max-width: 240px; }
+.doc-check { display: inline-flex; align-items: center; gap: 7px; padding: 0 4px; font-size: 13.5px; white-space: nowrap; cursor: pointer; }
+.doc-check input { width: 16px; height: 16px; margin: 0; accent-color: var(--doc-accent); }
+
+.doc-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    height: 36px; padding: 0 15px; border-radius: 999px; cursor: pointer; white-space: nowrap;
+    border: 1px solid var(--doc-line); background: #fff; color: var(--doc-ink);
+    font: inherit; font-size: 13.5px; font-weight: 600; text-decoration: none;
+}
+.doc-btn:hover { background: var(--doc-fill); }
+.doc-btn--primary { padding: 0 18px; border-color: var(--doc-ink); background: var(--doc-ink); color: #fff; }
+.doc-btn--primary:hover { background: #253a4b; }
+.doc-btn--ghost { border-color: transparent; background: transparent; color: var(--doc-soft); }
+
+.doc-tip { max-width: 210mm; margin: 14px auto 0; padding: 0 14px; text-align: center; font-size: 12px; color: var(--doc-soft); }
+.doc-desk--landscape .doc-tip { max-width: 297mm; }
+.doc-desk__sheets { padding: 16px 12px 56px; }
+
+/* ---------- The sheet ---------- */
+.sheet {
+    position: relative;
+    display: flex; flex-direction: column;
+    width: 210mm; max-width: 100%; min-height: 297mm;
+    margin: 0 auto 20px; padding: 15mm 15mm 14mm;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(20, 35, 46, .08), 0 14px 36px rgba(20, 35, 46, .12);
+}
+.sheet--landscape { width: 297mm; min-height: 210mm; padding: 11mm 12mm 11mm; }
+/* On a short document the footer settles at the foot of the page. */
+.sheet > .doc-foot { margin-top: auto; }
+.sheet > :nth-last-child(2) { margin-bottom: 5mm; }
+
+/* A diagonal stamp across a draft or cancelled document. */
+.doc-watermark { position: absolute; inset: 0; z-index: 0; display: grid; place-items: center; overflow: hidden; pointer-events: none; }
+.doc-watermark span {
+    transform: rotate(-24deg);
+    padding: 2mm 12mm; border: 2.5mm solid rgba(180, 35, 24, .11); border-radius: 6mm;
+    color: rgba(180, 35, 24, .11); font-size: 28mm; font-weight: 700; line-height: 1.25; white-space: nowrap;
+}
+.sheet > :not(.doc-watermark) { position: relative; z-index: 1; }
+
+/* ---------- Letterhead ---------- */
+.lh {
+    position: relative;
+    display: flex; align-items: flex-start; gap: 4mm;
+    margin-bottom: 5mm; padding-bottom: 4mm;
+    border-bottom: .5mm solid var(--doc-ink);
+}
+.lh::after { content: ""; position: absolute; left: 0; bottom: -1.5mm; width: 38mm; height: .9mm; background: var(--doc-accent); }
+.lh__logo {
+    flex: none; width: 15mm; height: 15mm; border-radius: 3.5mm;
+    display: grid; place-items: center;
+    background: var(--doc-ink); color: #fff; font-size: 17px; font-weight: 700; letter-spacing: .02em;
+}
+.lh__logo--img { background: none; border-radius: 0; object-fit: contain; }
+.lh__org { flex: 1; min-width: 0; }
+.lh__name { font-size: 17px; font-weight: 700; line-height: 1.3; color: var(--doc-ink); }
+.lh__name-en { font-size: 11.5px; letter-spacing: .02em; color: var(--doc-soft); }
+.lh__meta { margin-top: 1mm; font-size: 11px; line-height: 1.5; color: var(--doc-soft); }
+.lh__doc { flex: none; max-width: 48%; text-align: right; }
+.lh__doc-title { font-size: 19px; font-weight: 700; line-height: 1.25; color: var(--doc-ink); }
+.lh__doc-sub { margin-bottom: 1.5mm; font-size: 10.5px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--doc-accent); }
+.lh__doc-meta { font-size: 11.5px; color: var(--doc-text); }
+.lh__doc-meta span { color: var(--doc-muted); }
+
+/* Letters and notices: the organisation centred above the text. */
+.lh--center { flex-direction: column; align-items: center; gap: 1.5mm; margin-bottom: 2mm; text-align: center; border-bottom: 0; }
+.lh--center::after { display: none; }
+.lh--center .lh__logo { width: 18mm; height: 18mm; font-size: 20px; }
+
+/* ---------- Headline & flags ---------- */
+.doc-headline { display: flex; align-items: flex-start; justify-content: space-between; gap: 4mm; margin: 0 0 3mm; }
+.doc-headline__title { font-size: 16px; font-weight: 700; color: var(--doc-ink); }
+.doc-headline__sub { font-size: 12px; color: var(--doc-soft); }
+.doc-flag {
+    flex: none; display: inline-block; padding: 0 8px;
+    border: 1px solid currentColor; border-radius: 3px;
+    color: var(--doc-danger); font-size: 10.5px; font-weight: 700; letter-spacing: .06em; white-space: nowrap;
+}
+.doc-flag--ink { color: var(--doc-ink); }
+
+/* ---------- Sections ---------- */
+.doc-section { margin-top: 5mm; }
+.doc-section__title {
+    display: flex; align-items: center; gap: 2.5mm;
+    margin-bottom: 2.5mm;
+    font-size: 13px; font-weight: 700; color: var(--doc-ink);
+    break-after: avoid;
+}
+.doc-section__title::before { content: ""; flex: none; width: 1.2mm; height: 4.2mm; border-radius: 1mm; background: var(--doc-accent); }
+.doc-section__title small { margin-left: auto; font-size: 11px; font-weight: 400; color: var(--doc-muted); }
+
+/* Label / value pairs in two or three columns. */
+.kv { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 8mm; margin: 0; }
+.kv--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 6mm; }
+.kv__row {
+    display: grid; grid-template-columns: 34mm minmax(0, 1fr); gap: 3mm;
+    padding: 1.3mm 0; border-bottom: 1px dotted var(--doc-line);
+    font-size: 13px; break-inside: avoid;
+}
+.kv--3 .kv__row { grid-template-columns: 22mm minmax(0, 1fr); }
+.kv__row--full { grid-column: 1 / -1; }
+.kv__row dt { color: var(--doc-soft); }
+.kv__row dd { margin: 0; font-weight: 500; color: var(--doc-text); overflow-wrap: anywhere; }
+
+/* ---------- Tables ---------- */
+.doc-table-wrap { width: 100%; }
+.doc-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.doc-table th,
+.doc-table td { padding: 1.5mm 2.2mm; border: 1px solid var(--doc-line); text-align: left; vertical-align: top; }
+.doc-table thead { display: table-header-group; }
+/* Totals print once, under the last row, rather than on every page. */
+.doc-table tfoot { display: table-row-group; }
+.doc-table thead th { background: var(--doc-fill); color: var(--doc-ink); font-size: 11.5px; font-weight: 600; line-height: 1.35; vertical-align: bottom; }
+.doc-table tr { break-inside: avoid; }
+.doc-table tfoot td { background: var(--doc-fill); font-weight: 700; color: var(--doc-ink); }
+.doc-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.doc-table .center { text-align: center; white-space: nowrap; }
+.doc-table .nowrap { white-space: nowrap; }
+.doc-table__note { font-size: 11.5px; color: var(--doc-soft); }
+.doc-table--compact { font-size: 11.5px; line-height: 1.4; }
+.doc-table--compact th,
+.doc-table--compact td { padding: .9mm 1.8mm; }
+/* A whole month of days has to fit one portrait page. */
+.doc-table--dense { font-size: 11px; line-height: 1.2; }
+.doc-table--dense th,
+.doc-table--dense td { padding: .3mm 1.8mm; }
+.doc-table--tall td { height: 9.5mm; vertical-align: middle; }
+.doc-table tr.is-off td { background: #f6f8f9; color: var(--doc-muted); }
+.doc-table tr.is-alert .doc-status { color: var(--doc-danger); font-weight: 600; }
+.doc-table tr.is-picked td { background: #e6f3f2; font-weight: 600; color: var(--doc-ink); }
+.doc-table .is-blank td { color: transparent; }
+.doc-sub { display: block; font-size: 11px; font-weight: 400; color: var(--doc-muted); }
+
+/* ---------- Money ---------- */
+.pay { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; align-items: start; }
+.net {
+    display: flex; align-items: center; justify-content: space-between; gap: 6mm;
+    margin-top: 4mm; padding: 3.5mm 5mm;
+    border: .4mm solid var(--doc-ink); border-radius: 2mm; background: var(--doc-fill);
+    break-inside: avoid;
+}
+.net__label { font-size: 14px; font-weight: 700; color: var(--doc-ink); }
+.net__words { font-size: 12px; color: var(--doc-soft); }
+.net__amount { font-size: 24px; font-weight: 700; line-height: 1.2; color: var(--doc-ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.net__amount small { font-size: 13px; font-weight: 500; color: var(--doc-soft); }
+
+/* A strip of figures. */
+.doc-stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(26mm, 1fr));
+    margin-bottom: 4mm; overflow: hidden;
+    border: 1px solid var(--doc-line); border-radius: 2mm;
+    break-inside: avoid;
+}
+.doc-stat { padding: 1.8mm 3mm; border-right: 1px solid var(--doc-line-soft); }
+.doc-stat:last-child { border-right: 0; }
+.doc-stat span { display: block; font-size: 11px; line-height: 1.35; color: var(--doc-soft); }
+.doc-stat b { display: block; font-size: 16px; font-weight: 700; line-height: 1.35; color: var(--doc-ink); font-variant-numeric: tabular-nums; }
+.doc-stat b small { font-size: 11px; font-weight: 500; color: var(--doc-soft); }
+/* Eight or more figures on one row of a portrait page. */
+.doc-stats--dense { grid-template-columns: repeat(auto-fit, minmax(19mm, 1fr)); }
+.doc-stats--dense .doc-stat { padding: 1.2mm 2.4mm; }
+.doc-stats--dense .doc-stat b { font-size: 14.5px; }
+
+.doc-note { margin-top: 3mm; font-size: 12px; color: var(--doc-soft); }
+.doc-note b { color: var(--doc-ink); }
+.doc-filter { margin: -1mm 0 3mm; font-size: 12px; color: var(--doc-soft); }
+.doc-text {
+    min-height: 16mm; padding: 3mm 4mm;
+    border: 1px solid var(--doc-line-soft); border-radius: 2mm; background: #fbfcfc;
+    font-size: 13px; white-space: pre-line; overflow-wrap: anywhere;
+}
+.doc-empty { padding: 8mm; border: 1px dashed var(--doc-line); border-radius: 2mm; text-align: center; color: var(--doc-muted); }
+
+/* ---------- Letters ---------- */
+.doc-title { margin: 5mm 0 1mm; text-align: center; font-size: 20px; font-weight: 700; color: var(--doc-ink); }
+.doc-subtitle { text-align: center; font-size: 14px; }
+.letter-meta { display: flex; align-items: flex-start; justify-content: space-between; gap: 6mm; margin: 3mm 0 4mm; font-size: 14px; }
+.letter-meta__right { text-align: right; }
+.letter { font-size: 15px; line-height: 2; }
+.letter p { margin-bottom: 1.5mm; text-indent: 18mm; overflow-wrap: anywhere; }
+.letter p.flush { text-indent: 0; }
+/* A filled-in blank on a form: the value on a dotted rule. */
+.fill { padding: 0 2mm; border-bottom: 1px dotted var(--doc-soft); font-weight: 600; color: var(--doc-ink); }
+
+.notice__head { margin: 1mm 0 6mm; text-align: center; }
+.notice__org { font-size: 18px; font-weight: 700; color: var(--doc-ink); }
+.notice__subject { margin-top: 1mm; font-size: 16px; font-weight: 600; color: var(--doc-ink); }
+.notice__rule { width: 36mm; margin: 4mm auto 0; border-top: .4mm solid var(--doc-ink); }
+
+/* ---------- Tick boxes & approval boxes ---------- */
+.checks { display: flex; flex-wrap: wrap; gap: 1.5mm 7mm; margin: 1mm 0 2mm; font-size: 13px; }
+.check { display: inline-flex; align-items: center; gap: 2mm; }
+.check i {
+    flex: none; width: 3.8mm; height: 3.8mm;
+    display: inline-grid; place-items: center;
+    border: .3mm solid var(--doc-ink); border-radius: .6mm;
+    font-style: normal; font-size: 3.2mm; font-weight: 700; line-height: 1; color: var(--doc-ink);
+}
+.check.is-on i::after { content: "✓"; }
+
+.doc-boxes { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; margin-top: 5mm; break-inside: avoid; }
+.doc-box { padding: 3.5mm 4mm 4mm; border: 1px solid var(--doc-line); border-radius: 2mm; }
+.doc-box__title { margin-bottom: 1mm; font-size: 13px; font-weight: 700; color: var(--doc-ink); }
+.doc-lines {
+    min-height: 11mm; font-size: 12.5px; line-height: 5.5mm;
+    background-image: linear-gradient(to bottom, transparent calc(5.5mm - 1px), var(--doc-line-soft) calc(5.5mm - 1px));
+    background-size: 100% 5.5mm;
+}
+
+/* ---------- Signatures ---------- */
+.signs { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 6mm; margin-top: 7mm; break-inside: avoid; }
+.signs--end { grid-template-columns: minmax(0, 1fr) 78mm; }
+.signs--end > .sign { grid-column: 2; }
+.sign { font-size: 12.5px; text-align: center; break-inside: avoid; }
+.sign__note { margin-bottom: 2mm; text-align: left; }
+.sign__line { display: flex; align-items: flex-end; gap: 2mm; height: 10mm; padding: 0 2mm; }
+.sign__line::after { content: ""; flex: 1; margin-bottom: 1.3mm; border-bottom: 1px dotted var(--doc-ink); }
+.sign__name { margin-top: 1mm; font-weight: 500; }
+.sign__blank { display: inline-block; width: 40mm; border-bottom: 1px dotted var(--doc-muted); vertical-align: -.6mm; }
+.sign__role { font-weight: 700; color: var(--doc-ink); }
+.sign__meta { font-size: 11.5px; color: var(--doc-soft); }
+.doc-box .sign { margin-top: 2mm; }
+
+.letter-sign { display: grid; grid-template-columns: minmax(0, 1fr) 80mm; align-items: end; gap: 6mm; margin-top: 8mm; break-inside: avoid; }
+.letter-sign__lead { margin-bottom: 1mm; text-align: center; font-size: 15px; }
+.stamp {
+    justify-self: center; width: 28mm; height: 28mm;
+    display: grid; place-items: center; text-align: center;
+    border: 1px dashed var(--doc-line); border-radius: 50%;
+    font-size: 10.5px; line-height: 1.3; color: var(--doc-muted);
+}
+
+/* ---------- Employee record ---------- */
+.profile { display: grid; grid-template-columns: 28mm minmax(0, 1fr); gap: 6mm; align-items: start; }
+.profile__photo {
+    width: 28mm; height: 35mm; overflow: hidden;
+    display: grid; place-items: center;
+    border: 1px solid var(--doc-line); border-radius: 1.5mm; background: var(--doc-fill);
+    font-size: 22px; font-weight: 700; color: var(--doc-muted);
+}
+.profile__photo img { width: 100%; height: 100%; object-fit: cover; }
+.profile__name { font-size: 19px; font-weight: 700; line-height: 1.3; color: var(--doc-ink); }
+.profile__sub { margin-bottom: 2mm; font-size: 13px; color: var(--doc-soft); }
+.tags { display: flex; flex-wrap: wrap; gap: 2mm; margin-bottom: 2mm; }
+.tag { padding: 0 2.5mm; border: 1px solid var(--doc-line); border-radius: 999px; background: var(--doc-fill); font-size: 11px; font-weight: 600; color: var(--doc-ink); }
+
+/* ---------- Performance score ---------- */
+.score { display: grid; grid-template-columns: 40mm minmax(0, 1fr); gap: 5mm; align-items: stretch; }
+.score__total {
+    display: grid; place-content: center; padding: 3mm; text-align: center;
+    border: .4mm solid var(--doc-ink); border-radius: 2mm; background: var(--doc-fill);
+}
+.score__total b { font-size: 34px; line-height: 1.1; color: var(--doc-ink); font-variant-numeric: tabular-nums; }
+.score__total b small { font-size: 15px; font-weight: 500; color: var(--doc-soft); }
+.score__total span { font-size: 13px; font-weight: 600; color: var(--doc-ink); }
+
+/* ---------- Footer ---------- */
+.doc-foot {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1mm 4mm;
+    padding-top: 2mm; border-top: 1px solid var(--doc-line-soft);
+    font-size: 10.5px; color: var(--doc-muted);
+}
+
+/* ---------- Smaller screens ---------- */
+@media screen and (max-width: 860px) {
+    .sheet,
+    .sheet--landscape { min-height: 0; padding: 26px 20px 22px; }
+    .doc-table-wrap { overflow-x: auto; }
+    .sheet--landscape .doc-table { min-width: 760px; }
+}
+
+@media screen and (max-width: 620px) {
+    .doc-bar { gap: 8px; }
+    .doc-bar__title small,
+    .doc-tip { display: none; }
+    .doc-bar__options { order: 3; width: 100%; }
+    .doc-options { width: 100%; }
+    .doc-options .doc-field { flex: 1 1 140px; width: auto; max-width: none; }
+    .doc-btn--primary span { display: none; }
+    .doc-btn--primary { width: 40px; padding: 0; }
+
+    .doc-desk__sheets { padding: 10px 0 40px; }
+    .sheet { margin-bottom: 0; padding: 20px 14px; box-shadow: none; }
+    .lh { flex-wrap: wrap; }
+    .lh__doc { width: 100%; max-width: none; text-align: left; }
+    .kv,
+    .kv--3,
+    .pay,
+    .doc-boxes,
+    .profile,
+    .score,
+    .letter-sign { grid-template-columns: minmax(0, 1fr); }
+    .signs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .signs--end > .sign { grid-column: 1 / -1; }
+    .doc-table { min-width: 520px; }
+    .pay .doc-table { min-width: 0; }
+    .letter p { text-indent: 10mm; }
+    .doc-watermark span { font-size: 64px; }
+}
+
+/* ---------- Paper ---------- */
+@media print {
+    body.doc-desk { background: #fff; }
+    .doc-bar,
+    .doc-tip,
+    .no-print { display: none !important; }
+    .doc-desk__sheets { padding: 0; }
+    .sheet,
+    .sheet--landscape { display: block; width: auto; max-width: none; min-height: 0; margin: 0; padding: 0; box-shadow: none; }
+    .sheet + .sheet { break-before: page; }
+    .sheet--landscape { page: landscape; }
+    /* Fixed elements repeat on every printed page. */
+    .doc-watermark { position: fixed; }
+    .doc-table-wrap { overflow: visible; }
+    a { color: inherit; text-decoration: none; }
+}

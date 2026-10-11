@@ -93,6 +93,22 @@ class AnnouncementController extends Controller implements HasMiddleware
         ]);
     }
 
+    /**
+     * The announcement as a formal notice to post up. Drafts follow the
+     * same rule as on screen.
+     */
+    public function print(Request $request, Announcement $announcement): View
+    {
+        abort_unless(
+            $announcement->is_published || $request->user()->hasPermission('announcements.manage'),
+            403,
+        );
+
+        $announcement->load('author');
+
+        return view('print.announcement', ['announcement' => $announcement]);
+    }
+
     public function edit(Announcement $announcement): View
     {
         return view('announcements.edit', [
