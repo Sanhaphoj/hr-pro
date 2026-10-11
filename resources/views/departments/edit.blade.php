@@ -24,7 +24,7 @@
                     <x-checkbox name="is_active" label="เปิดใช้งาน" :checked="$department->is_active" />
                 </div>
             </div>
-            <div class="flex items-center gap-1" style="margin-top:18px;">
+            <div class="form-actions">
                 <x-button type="submit" icon="check">บันทึกการเปลี่ยนแปลง</x-button>
                 <x-button href="{{ route('departments.index') }}" variant="ghost">ยกเลิก</x-button>
             </div>

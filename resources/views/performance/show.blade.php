@@ -4,19 +4,20 @@
 @section('content')
     <x-page-header :title="'ผลการประเมิน · '.$review->period" :subtitle="$review->employee?->full_name">
         <x-slot:breadcrumb><a href="{{ route('performance.index') }}">← กลับรายการประเมินผล</a></x-slot:breadcrumb>
-        @can('performance.manage')
-            <x-slot:actions>
+        <x-slot:actions>
+            <x-button :href="route('performance.print', $review)" variant="secondary" size="sm" icon="printer">พิมพ์แบบประเมิน</x-button>
+            @can('performance.manage')
                 <form method="POST" action="{{ route('performance.destroy', $review) }}" data-confirm="ลบผลการประเมินนี้?">
                     @csrf @method('DELETE')
                     <x-button type="submit" variant="danger" size="sm" icon="trash">ลบ</x-button>
                 </form>
-            </x-slot:actions>
-        @endcan
+            @endcan
+        </x-slot:actions>
     </x-page-header>
 
     <div style="max-width:680px;">
         <x-card>
-            <div class="flex items-center justify-between" style="margin-bottom:16px;">
+            <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center gap-2">
                     <span class="avatar avatar--lg" style="background: {{ avatar_color($review->employee?->email) }}">{{ $review->employee?->initials }}</span>
                     <div>

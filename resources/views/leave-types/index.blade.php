@@ -12,10 +12,14 @@
 
     <x-card :padding="false">
         @if($leaveTypes->isEmpty())
-            <x-empty icon="calendar" title="ยังไม่มีประเภทการลา" message="เริ่มต้นด้วยการเพิ่มประเภทการลาประเภทแรก" />
+            <x-empty icon="calendar" title="ยังไม่มีประเภทการลา" message="เริ่มต้นด้วยการเพิ่มประเภทการลาประเภทแรก">
+                @can('leave-types.create')
+                    <x-button href="{{ route('leave-types.create') }}" icon="plus">เพิ่มประเภทการลา</x-button>
+                @endcan
+            </x-empty>
         @else
             <div class="table-wrap">
-                <table class="table">
+                <table class="table table--cards">
                     <thead>
                         <tr>
                             <th>ชื่อประเภท</th>
@@ -38,18 +42,18 @@
                                         <div class="cell-sub">{{ \Illuminate\Support\Str::limit($leaveType->description, 60) }}</div>
                                     @endif
                                 </td>
-                                <td class="cell-sub">{{ $leaveType->code }}</td>
-                                <td class="cell-strong">{{ number_format($leaveType->days_per_year) }} วัน</td>
-                                <td>
+                                <td class="cell-sub" data-label="รหัส">{{ $leaveType->code }}</td>
+                                <td class="cell-strong" data-label="วันลาต่อปี">{{ number_format($leaveType->days_per_year) }} วัน</td>
+                                <td data-label="ค่าจ้าง">
                                     @if($leaveType->is_paid)
                                         <x-badge color="green">มีค่าจ้าง</x-badge>
                                     @else
                                         <x-badge color="gray">ไม่มีค่าจ้าง</x-badge>
                                     @endif
                                 </td>
-                                <td class="cell-sub">{{ $leaveType->requires_approval ? 'ใช่' : 'ไม่' }}</td>
-                                <td><x-status-badge type="active" :value="$leaveType->is_active" /></td>
-                                <td>
+                                <td class="cell-sub" data-label="ต้องอนุมัติ">{{ $leaveType->requires_approval ? 'ใช่' : 'ไม่' }}</td>
+                                <td data-label="สถานะ"><x-status-badge type="active" :value="$leaveType->is_active" /></td>
+                                <td class="actions">
                                     <div class="flex items-center gap-2 justify-end">
                                         @can('leave-types.update')
                                             <a href="{{ route('leave-types.edit', $leaveType) }}" class="btn btn--ghost btn--sm" title="แก้ไข">
@@ -70,7 +74,7 @@
                     </tbody>
                 </table>
             </div>
-            <div style="padding:12px 20px;">{{ $leaveTypes->links() }}</div>
+            <div class="card__pager">{{ $leaveTypes->links() }}</div>
         @endif
     </x-card>
 @endsection

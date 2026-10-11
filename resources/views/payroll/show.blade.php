@@ -7,7 +7,7 @@
             <a href="{{ route('payroll.index', ['year' => $payroll->period_year, 'month' => $payroll->period_month]) }}">← กลับรายการเงินเดือน</a>
         </x-slot:breadcrumb>
         <x-slot:actions>
-            <button type="button" class="btn btn--secondary btn--sm" onclick="window.print()"><x-icon name="download" width="16" height="16" /> พิมพ์ / บันทึก PDF</button>
+            <x-button :href="route('payroll.print', $payroll)" variant="secondary" size="sm" icon="printer">พิมพ์ / บันทึก PDF</x-button>
             @can('payroll.manage')
                 @if($payroll->status !== 'finalized')
                     <form method="POST" action="{{ route('payroll.finalize', $payroll) }}">
@@ -21,7 +21,7 @@
 
     <div style="max-width:640px;">
         <x-card>
-            <div class="flex items-center justify-between" style="margin-bottom:16px;">
+            <div class="flex items-center justify-between mb-2">
                 <div>
                     <div class="cell-strong" style="font-size:16px;">{{ config('hrpro.company_name') }}</div>
                     <div class="cell-sub">สลิปเงินเดือนงวด {{ $payroll->period_label }}</div>
@@ -38,7 +38,7 @@
                 <dt>ตำแหน่ง</dt><dd>{{ $payroll->employee?->position?->title ?? '—' }}</dd>
             </dl>
 
-            <table class="table" style="margin-top:16px;">
+            <table class="table section-gap">
                 <tbody>
                     <tr><td>เงินเดือนฐาน</td><td class="num">{{ thb($payroll->base_salary) }}</td></tr>
                     <tr><td>เบี้ยเลี้ยง / ค่าตอบแทน</td><td class="num">{{ thb($payroll->allowances) }}</td></tr>
@@ -48,7 +48,7 @@
             </table>
 
             @if($payroll->note)
-                <p class="cell-sub" style="margin-top:12px;">หมายเหตุ: {{ $payroll->note }}</p>
+                <p class="cell-sub field-gap">หมายเหตุ: {{ $payroll->note }}</p>
             @endif
         </x-card>
     </div>

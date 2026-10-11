@@ -4,18 +4,19 @@
 @section('content')
     <x-page-header :title="$course->title" :subtitle="$course->hours.' ชั่วโมง'.($course->scheduled_date ? ' · '.$course->scheduled_date->translatedFormat('j F Y') : '')">
         <x-slot:breadcrumb><a href="{{ route('training.index') }}">← กลับรายการหลักสูตร</a></x-slot:breadcrumb>
-        @can('training.manage')
-            <x-slot:actions>
+        <x-slot:actions>
+            <x-button :href="route('training.print', $course)" variant="secondary" size="sm" icon="printer">พิมพ์ใบลงชื่อ</x-button>
+            @can('training.manage')
                 <form method="POST" action="{{ route('training.destroy', $course) }}" data-confirm="ลบหลักสูตรนี้?">
                     @csrf @method('DELETE')
                     <x-button type="submit" variant="danger" size="sm" icon="trash">ลบหลักสูตร</x-button>
                 </form>
-            </x-slot:actions>
-        @endcan
+            @endcan
+        </x-slot:actions>
     </x-page-header>
 
     <div class="grid grid--2">
-        <div class="grid" style="align-content:start;">
+        <div class="grid content-start">
             <x-card title="ผู้ลงทะเบียน ({{ $course->enrollments->count() }})" :padding="false">
                 @if($course->enrollments->isEmpty())
                     <x-empty icon="users" title="ยังไม่มีผู้ลงทะเบียน" />
@@ -28,7 +29,7 @@
                                     <tr>
                                         <td class="cell-strong">{{ $enrollment->employee?->full_name ?? '—' }}</td>
                                         <td><x-badge :color="$enrollment->status === 'completed' ? 'green' : 'blue'">{{ $enrollment->status === 'completed' ? 'จบหลักสูตร' : 'กำลังอบรม' }}</x-badge></td>
-                                        <td style="text-align:right;">
+                                        <td class="actions">
                                             @can('training.manage')
                                                 @if($enrollment->status !== 'completed')
                                                     <form method="POST" action="{{ route('training.complete', [$course, $enrollment]) }}">
@@ -47,7 +48,7 @@
             </x-card>
         </div>
 
-        <div class="grid" style="align-content:start;">
+        <div class="grid content-start">
             @if($course->description)
                 <x-card title="รายละเอียดหลักสูตร">
                     <p style="white-space:pre-line; margin:0;">{{ $course->description }}</p>
@@ -62,7 +63,7 @@
                         <form method="POST" action="{{ route('training.enroll', $course) }}">
                             @csrf
                             <x-select name="employee_id" label="เลือกพนักงาน" :options="$employees" placeholder="— เลือกพนักงาน —" :required="true" />
-                            <div style="margin-top:14px;"><x-button type="submit" icon="plus">ลงทะเบียน</x-button></div>
+                            <div class="field-gap"><x-button type="submit" icon="plus">ลงทะเบียน</x-button></div>
                         </form>
                     @endif
                 </x-card>

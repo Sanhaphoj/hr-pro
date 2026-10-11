@@ -14,15 +14,15 @@
         @if($unread > 0)<span class="dot"></span>@endif
     </a>
 
-    <div data-dropdown style="position: relative;">
+    <div class="dropdown" data-dropdown>
         <div class="usermenu" data-dropdown-trigger>
             <span class="avatar" style="background: {{ avatar_color($user->email) }}">{{ $user->initials }}</span>
-            <span style="line-height: 1.2;">
-                <span style="font-weight: 600; display: block;">{{ $user->name }}</span>
-                <span class="cell-sub">{{ $user->roles->pluck('name')->join(', ') ?: 'ผู้ใช้งาน' }}</span>
+            <span class="usermenu__text">
+                <span class="usermenu__name">{{ $user->name }}</span>
+                <span class="usermenu__role cell-sub">{{ $user->roles->pluck('name')->join(', ') ?: 'ผู้ใช้งาน' }}</span>
             </span>
         </div>
-        <div data-dropdown-menu style="display:none; position:absolute; right:0; top:52px; background:#fff; border:1px solid var(--c-border); border-radius:10px; box-shadow:var(--shadow-md); min-width:200px; padding:6px; z-index:50;">
+        <div class="dropdown__menu" data-dropdown-menu>
             <a href="{{ route('profile.edit') }}" class="nav__link" style="color:var(--c-text);">
                 <x-icon name="user" /> <span>โปรไฟล์ของฉัน</span>
             </a>

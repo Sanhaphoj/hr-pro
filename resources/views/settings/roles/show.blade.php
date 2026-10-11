@@ -15,6 +15,13 @@
         'audit-logs' => 'บันทึกการใช้งาน',
         'users' => 'ผู้ใช้งาน',
         'roles' => 'บทบาท',
+        'work-locations' => 'บริเวณลงเวลา',
+        'payroll' => 'เงินเดือน',
+        'recruitment' => 'สรรหาบุคลากร',
+        'performance' => 'ประเมินผล',
+        'training' => 'ฝึกอบรม',
+        'documents' => 'คลังเอกสาร',
+        'settings' => 'การตั้งค่าระบบ',
     ];
 @endphp
 
@@ -38,9 +45,9 @@
             @forelse($permissionGroups as $group => $permissions)
                 @php $items = $assigned->get($group); @endphp
                 @if($items && $items->isNotEmpty())
-                    <div style="margin-bottom:16px;">
+                    <div class="mb-2">
                         <div class="cell-strong" style="margin-bottom:8px;">{{ $groupLabels[$group] ?? $group }}</div>
-                        <div class="flex items-center gap-2" style="flex-wrap:wrap;">
+                        <div class="flex items-center gap-2 flex-wrap">
                             @foreach($items as $permission)
                                 <x-badge color="blue">{{ $permission->description ?: $permission->name }}</x-badge>
                             @endforeach
@@ -55,7 +62,7 @@
             @endif
         </x-card>
 
-        <div class="grid" style="align-content:start;">
+        <div class="grid content-start">
             <x-card title="ข้อมูลบทบาท">
                 <dl class="dl">
                     <dt>ชื่อบทบาท</dt><dd>{{ $role->name }}</dd>

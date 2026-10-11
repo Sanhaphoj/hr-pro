@@ -19,30 +19,34 @@
         </div>
 
         @if($positions->isEmpty())
-            <x-empty icon="briefcase" title="ยังไม่มีตำแหน่ง" message="เริ่มต้นด้วยการเพิ่มตำแหน่งงานแรก" />
+            <x-empty icon="briefcase" title="ยังไม่มีตำแหน่ง" message="เริ่มต้นด้วยการเพิ่มตำแหน่งงานแรก">
+                @can('positions.create')
+                    <x-button href="{{ route('positions.create') }}" icon="plus">เพิ่มตำแหน่งงาน</x-button>
+                @endcan
+            </x-empty>
         @else
             <div class="table-wrap">
-                <table class="table">
+                <table class="table table--cards">
                     <thead>
                         <tr>
-                            <th>รหัส</th>
                             <th>ชื่อตำแหน่ง</th>
+                            <th>รหัส</th>
                             <th>แผนก</th>
                             <th>ระดับ</th>
                             <th>สถานะ</th>
-                            <th style="text-align:right;">จัดการ</th>
+                            <th class="actions">จัดการ</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($positions as $position)
                             <tr>
-                                <td class="cell-sub">{{ $position->code }}</td>
                                 <td class="cell-strong">{{ $position->title }}</td>
-                                <td>{{ $position->department?->name ?? '—' }}</td>
-                                <td>{{ $levelLabels[$position->level] ?? $position->level }}</td>
-                                <td><x-status-badge type="active" :value="$position->is_active" /></td>
-                                <td style="text-align:right;">
-                                    <div class="flex items-center gap-1" style="justify-content:flex-end;">
+                                <td class="cell-sub" data-label="รหัส">{{ $position->code }}</td>
+                                <td data-label="แผนก">{{ $position->department?->name ?? '—' }}</td>
+                                <td data-label="ระดับ">{{ $levelLabels[$position->level] ?? $position->level }}</td>
+                                <td data-label="สถานะ"><x-status-badge type="active" :value="$position->is_active" /></td>
+                                <td class="actions">
+                                    <div class="flex items-center gap-1 justify-end">
                                         @can('positions.update')
                                             <x-button href="{{ route('positions.edit', $position) }}" variant="ghost" size="sm" icon="edit">แก้ไข</x-button>
                                         @endcan
@@ -60,7 +64,7 @@
                     </tbody>
                 </table>
             </div>
-            <div style="padding:12px 20px;">{{ $positions->links() }}</div>
+            <div class="card__pager">{{ $positions->links() }}</div>
         @endif
     </x-card>
 @endsection

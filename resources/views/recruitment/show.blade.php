@@ -15,7 +15,7 @@
     </x-page-header>
 
     <div class="grid grid--2">
-        <div class="grid" style="align-content:start;">
+        <div class="grid content-start">
             <x-card title="ผู้สมัคร ({{ $posting->candidates->count() }})" :padding="false">
                 @if($posting->candidates->isEmpty())
                     <x-empty icon="user" title="ยังไม่มีผู้สมัคร" />
@@ -51,7 +51,7 @@
             </x-card>
         </div>
 
-        <div class="grid" style="align-content:start;">
+        <div class="grid content-start">
             @if($posting->description)
                 <x-card title="รายละเอียดงาน">
                     <p style="white-space:pre-line; margin:0;">{{ $posting->description }}</p>
@@ -63,10 +63,10 @@
                     <form method="POST" action="{{ route('recruitment.candidates.store', $posting) }}">
                         @csrf
                         <x-input name="name" label="ชื่อ-นามสกุล" :required="true" />
-                        <div style="margin-top:12px;"><x-input name="email" type="email" label="อีเมล" /></div>
-                        <div style="margin-top:12px;"><x-input name="phone" label="โทรศัพท์" /></div>
-                        <div style="margin-top:12px;"><x-textarea name="note" label="บันทึก" rows="2" /></div>
-                        <div style="margin-top:14px;"><x-button type="submit" icon="plus">เพิ่มผู้สมัคร</x-button></div>
+                        <div class="field-gap"><x-input name="email" type="email" label="อีเมล" /></div>
+                        <div class="field-gap"><x-input name="phone" label="โทรศัพท์" /></div>
+                        <div class="field-gap"><x-textarea name="note" label="บันทึก" rows="2" /></div>
+                        <div class="field-gap"><x-button type="submit" icon="plus">เพิ่มผู้สมัคร</x-button></div>
                     </form>
                 </x-card>
             @endcan

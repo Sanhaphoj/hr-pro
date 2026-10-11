@@ -33,7 +33,7 @@
                          message="{{ $employee ? 'เริ่มต้นด้วยการกดปุ่ม “ขอลางาน”' : 'ยังไม่มีคำขอลาในระบบ' }}" />
             @else
                 <div class="table-wrap">
-                    <table class="table">
+                    <table class="table table--cards">
                         <thead>
                             <tr>
                                 @if($viewAll)<th>พนักงาน</th>@endif
@@ -41,7 +41,7 @@
                                 <th>ช่วงวันที่</th>
                                 <th>จำนวนวัน</th>
                                 <th>สถานะ</th>
-                                <th style="text-align:right;">จัดการ</th>
+                                <th class="actions">จัดการ</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -54,12 +54,12 @@
                                     @if($viewAll)
                                         <td class="cell-strong">{{ $req->employee?->full_name ?? '—' }}</td>
                                     @endif
-                                    <td>{{ $req->leaveType?->name ?? '—' }}</td>
-                                    <td class="cell-sub">{{ $req->start_date->format('d/m/Y') }} – {{ $req->end_date->format('d/m/Y') }}</td>
-                                    <td>{{ rtrim(rtrim(number_format((float) $req->total_days, 1), '0'), '.') }} วัน</td>
-                                    <td><x-status-badge type="leave" :value="$req->status" /></td>
+                                    <td data-label="ประเภทการลา">{{ $req->leaveType?->name ?? '—' }}</td>
+                                    <td class="cell-sub" data-label="ช่วงวันที่">{{ $req->start_date->format('d/m/Y') }} – {{ $req->end_date->format('d/m/Y') }}</td>
+                                    <td data-label="จำนวนวัน">{{ rtrim(rtrim(number_format((float) $req->total_days, 1), '0'), '.') }} วัน</td>
+                                    <td data-label="สถานะ"><x-status-badge type="leave" :value="$req->status" /></td>
                                     <td>
-                                        <div class="flex items-center gap-2" style="justify-content:flex-end;">
+                                        <div class="flex items-center gap-2 justify-end">
                                             <a href="{{ route('leave-requests.show', $req) }}" class="btn btn--ghost btn--sm">
                                                 <x-icon name="eye" width="16" height="16" />ดู
                                             </a>
@@ -77,7 +77,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div style="padding:0 20px 16px;">{{ $requests->links() }}</div>
+                <div class="card__pager">{{ $requests->links() }}</div>
             @endif
         </x-card>
     @endif

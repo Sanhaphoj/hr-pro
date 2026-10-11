@@ -16,6 +16,32 @@
         scrim.classList.remove('is-open');
     });
 
+    // --- Sidebar rail (desktop): collapse to icons, remembered -------------
+    // The class lives on <html> so the inline script in the layout can apply
+    // it before first paint; this only handles the toggle and persistence.
+    const navLinks = document.querySelectorAll('.sidebar .nav__link[data-label]');
+
+    // Collapsed icons need their name on hover, and the sidebar clips its own
+    // overflow, so the browser's own tooltip does the job.
+    function syncRailLabels(railed) {
+        navLinks.forEach(function (link) {
+            if (railed) {
+                link.setAttribute('title', link.dataset.label);
+            } else {
+                link.removeAttribute('title');
+            }
+        });
+    }
+    syncRailLabels(document.documentElement.classList.contains('is-rail'));
+
+    document.querySelectorAll('[data-toggle="rail"]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const railed = document.documentElement.classList.toggle('is-rail');
+            syncRailLabels(railed);
+            try { localStorage.setItem('hrpro.rail', railed ? '1' : '0'); } catch (e) { /* private mode */ }
+        });
+    });
+
     // --- Dropdown menus -----------------------------------------------------
     document.querySelectorAll('[data-dropdown]').forEach(function (root) {
         const trigger = root.querySelector('[data-dropdown-trigger]');

@@ -15,6 +15,13 @@
         'audit-logs' => 'บันทึกการใช้งาน',
         'users' => 'ผู้ใช้งาน',
         'roles' => 'บทบาท',
+        'work-locations' => 'บริเวณลงเวลา',
+        'payroll' => 'เงินเดือน',
+        'recruitment' => 'สรรหาบุคลากร',
+        'performance' => 'ประเมินผล',
+        'training' => 'ฝึกอบรม',
+        'documents' => 'คลังเอกสาร',
+        'settings' => 'การตั้งค่าระบบ',
     ];
     $checkedPermissions = old('permissions', []);
 @endphp
@@ -39,7 +46,7 @@
             </div>
         </x-card>
 
-        <div style="margin-top:18px;">
+        <div class="section-gap">
             <x-card title="สิทธิ์การเข้าถึง" subtitle="เลือกสิทธิ์ที่บทบาทนี้สามารถใช้งานได้">
                 @error('permissions')<span class="field__error">{{ $message }}</span>@enderror
                 @error('permissions.*')<span class="field__error">{{ $message }}</span>@enderror
@@ -63,7 +70,7 @@
             </x-card>
         </div>
 
-        <div class="flex items-center gap-2" style="margin-top:18px;">
+        <div class="form-actions">
             <x-button type="submit" icon="check">บันทึก</x-button>
             <x-button :href="route('settings.roles.index')" variant="ghost">ยกเลิก</x-button>
         </div>

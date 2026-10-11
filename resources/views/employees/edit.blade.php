@@ -35,7 +35,7 @@
                 <x-input name="emergency_contact_phone" label="เบอร์ผู้ติดต่อฉุกเฉิน" :value="$employee->emergency_contact_phone" />
             </div>
 
-            <div class="flex items-center gap-2" style="margin-top:20px;">
+            <div class="form-actions">
                 <x-button type="submit" icon="check">บันทึกการแก้ไข</x-button>
                 <x-button href="{{ route('employees.show', $employee) }}" variant="ghost">ยกเลิก</x-button>
             </div>

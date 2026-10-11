@@ -5,6 +5,7 @@
     <x-page-header :title="$announcement->title" subtitle="รายละเอียดประกาศ">
         <x-slot:actions>
             <x-button href="{{ route('announcements.index') }}" variant="ghost" icon="arrow-left">กลับ</x-button>
+            <x-button :href="route('announcements.print', $announcement)" variant="secondary" icon="printer">พิมพ์ประกาศ</x-button>
             @can('announcements.manage')
                 <x-button href="{{ route('announcements.edit', $announcement) }}" variant="secondary" icon="edit">แก้ไข</x-button>
                 <form method="POST" action="{{ route('announcements.destroy', $announcement) }}" data-confirm="ยืนยันการลบ?">

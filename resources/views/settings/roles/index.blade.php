@@ -15,7 +15,7 @@
             <x-empty icon="shield" title="ยังไม่มีบทบาท" message="สร้างบทบาทเพื่อกำหนดสิทธิ์การเข้าถึงระบบ" />
         @else
             <div class="table-wrap">
-                <table class="table">
+                <table class="table table--cards">
                     <thead>
                         <tr>
                             <th>ชื่อบทบาท</th>
@@ -24,26 +24,26 @@
                             <th>สิทธิ์</th>
                             <th>ผู้ใช้งาน</th>
                             <th>ประเภท</th>
-                            <th style="text-align:right;">การจัดการ</th>
+                            <th class="actions">การจัดการ</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($roles as $role)
                             <tr>
                                 <td class="cell-strong">{{ $role->name }}</td>
-                                <td><code>{{ $role->slug }}</code></td>
-                                <td class="cell-sub">{{ $role->description ?: '—' }}</td>
-                                <td>{{ number_format($role->permissions_count) }} สิทธิ์</td>
-                                <td>{{ number_format($role->users_count) }} คน</td>
-                                <td>
+                                <td data-label="รหัส (slug)"><code>{{ $role->slug }}</code></td>
+                                <td class="cell-sub" data-label="คำอธิบาย">{{ $role->description ?: '—' }}</td>
+                                <td data-label="สิทธิ์">{{ number_format($role->permissions_count) }} สิทธิ์</td>
+                                <td data-label="ผู้ใช้งาน">{{ number_format($role->users_count) }} คน</td>
+                                <td data-label="ประเภท">
                                     @if($role->is_system)
                                         <x-badge color="amber">ระบบ</x-badge>
                                     @else
                                         <x-badge color="gray">กำหนดเอง</x-badge>
                                     @endif
                                 </td>
-                                <td style="text-align:right;">
-                                    <div class="flex items-center gap-2" style="justify-content:flex-end;">
+                                <td class="actions">
+                                    <div class="flex items-center gap-2 justify-end">
                                         @can('roles.view')
                                             <x-button :href="route('settings.roles.show', $role)" variant="ghost" size="sm" icon="eye">ดู</x-button>
                                         @endcan
@@ -68,7 +68,7 @@
                     </tbody>
                 </table>
             </div>
-            <div style="padding:14px 20px;">{{ $roles->links() }}</div>
+            <div class="card__pager">{{ $roles->links() }}</div>
         @endif
     </x-card>
 @endsection

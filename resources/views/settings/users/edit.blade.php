@@ -24,7 +24,7 @@
             </div>
         </x-card>
 
-        <div style="margin-top:18px;">
+        <div class="section-gap">
             <x-card title="บทบาท" subtitle="กำหนดบทบาทเพื่อให้สิทธิ์การเข้าถึงระบบ">
                 @if($roles->isEmpty())
                     <x-empty icon="shield" title="ยังไม่มีบทบาท" message="กรุณาสร้างบทบาทก่อนกำหนดให้ผู้ใช้งาน" />
@@ -45,7 +45,7 @@
             </x-card>
         </div>
 
-        <div class="flex items-center gap-2" style="margin-top:18px;">
+        <div class="form-actions">
             <x-button type="submit" icon="check">บันทึก</x-button>
             <x-button :href="route('settings.users.index')" variant="ghost">ยกเลิก</x-button>
         </div>

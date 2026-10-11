@@ -5,6 +5,8 @@
     <x-page-header :title="$employee->full_name" :subtitle="($employee->position?->title ?? 'ยังไม่ระบุตำแหน่ง').' · '.($employee->department?->name ?? 'ยังไม่ระบุแผนก')">
         <x-slot:actions>
             <x-button href="{{ route('employees.index') }}" variant="ghost" icon="arrow-left">กลับ</x-button>
+            <x-button :href="route('employees.certificate', $employee)" variant="secondary" icon="award">หนังสือรับรอง</x-button>
+            <x-button :href="route('employees.print', $employee)" variant="secondary" icon="printer">พิมพ์ประวัติ</x-button>
             @can('employees.update')
                 <x-button href="{{ route('employees.edit', $employee) }}" icon="edit">แก้ไข</x-button>
             @endcan
@@ -12,9 +14,9 @@
     </x-page-header>
 
     <div class="grid grid--2">
-        <div class="grid" style="align-content:start;">
+        <div class="grid content-start">
             <x-card title="ข้อมูลพนักงาน">
-                <div class="flex items-center gap-2" style="margin-bottom:16px;">
+                <div class="flex items-center gap-2 mb-2">
                     <span class="avatar avatar--lg" style="background: {{ avatar_color($employee->email) }}">{{ $employee->initials }}</span>
                     <div>
                         <div class="cell-strong" style="font-size:16px;">{{ $employee->full_name }}</div>
@@ -45,30 +47,30 @@
             </x-card>
         </div>
 
-        <div class="grid" style="align-content:start;">
+        <div class="grid content-start">
             <x-card title="วันลาคงเหลือ ปี {{ $year + 543 }}">
                 @if($balances->isEmpty())
                     <x-empty icon="calendar" title="ยังไม่มีข้อมูลวันลา" message="ระบบจะสร้างยอดวันลาเมื่อมีการยื่นคำขอลา" />
                 @else
                     <div class="table-wrap">
-                        <table class="table">
+                        <table class="table table--cards">
                             <thead>
                                 <tr>
                                     <th>ประเภทการลา</th>
-                                    <th style="text-align:right;">สิทธิ์</th>
-                                    <th style="text-align:right;">ใช้ไป</th>
-                                    <th style="text-align:right;">รออนุมัติ</th>
-                                    <th style="text-align:right;">คงเหลือ</th>
+                                    <th class="actions">สิทธิ์</th>
+                                    <th class="actions">ใช้ไป</th>
+                                    <th class="actions">รออนุมัติ</th>
+                                    <th class="actions">คงเหลือ</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($balances as $balance)
                                     <tr>
                                         <td class="cell-strong">{{ $balance->leaveType?->name ?? '—' }}</td>
-                                        <td style="text-align:right;">{{ rtrim(rtrim(number_format((float) $balance->entitled_days, 1), '0'), '.') }}</td>
-                                        <td style="text-align:right;">{{ rtrim(rtrim(number_format((float) $balance->used_days, 1), '0'), '.') }}</td>
-                                        <td style="text-align:right;">{{ rtrim(rtrim(number_format((float) $balance->pending_days, 1), '0'), '.') }}</td>
-                                        <td style="text-align:right;" class="cell-strong">{{ rtrim(rtrim(number_format($balance->remaining_days, 1), '0'), '.') }}</td>
+                                        <td class="num" data-label="สิทธิ์">{{ rtrim(rtrim(number_format((float) $balance->entitled_days, 1), '0'), '.') }}</td>
+                                        <td class="num" data-label="ใช้ไป">{{ rtrim(rtrim(number_format((float) $balance->used_days, 1), '0'), '.') }}</td>
+                                        <td class="num" data-label="รออนุมัติ">{{ rtrim(rtrim(number_format((float) $balance->pending_days, 1), '0'), '.') }}</td>
+                                        <td class="num cell-strong" data-label="คงเหลือ">{{ rtrim(rtrim(number_format($balance->remaining_days, 1), '0'), '.') }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -82,12 +84,12 @@
                     <x-empty icon="inbox" title="ยังไม่มีคำขอลา" />
                 @else
                     <div class="table-wrap">
-                        <table class="table">
+                        <table class="table table--cards">
                             <thead>
                                 <tr>
                                     <th>ประเภท</th>
                                     <th>ช่วงวันที่</th>
-                                    <th style="text-align:right;">จำนวนวัน</th>
+                                    <th class="actions">จำนวนวัน</th>
                                     <th>สถานะ</th>
                                 </tr>
                             </thead>
@@ -95,9 +97,9 @@
                                 @foreach($leaveRequests as $request)
                                     <tr>
                                         <td class="cell-strong">{{ $request->leaveType?->name ?? '—' }}</td>
-                                        <td class="cell-sub">{{ $request->start_date->format('d/m/Y') }} – {{ $request->end_date->format('d/m/Y') }}</td>
-                                        <td style="text-align:right;">{{ rtrim(rtrim(number_format((float) $request->total_days, 1), '0'), '.') }}</td>
-                                        <td><x-status-badge type="leave" :value="$request->status" /></td>
+                                        <td class="cell-sub" data-label="ช่วงวันที่">{{ $request->start_date->format('d/m/Y') }} – {{ $request->end_date->format('d/m/Y') }}</td>
+                                        <td class="num" data-label="จำนวนวัน">{{ rtrim(rtrim(number_format((float) $request->total_days, 1), '0'), '.') }}</td>
+                                        <td data-label="สถานะ"><x-status-badge type="leave" :value="$request->status" /></td>
                                     </tr>
                                 @endforeach
                             </tbody>

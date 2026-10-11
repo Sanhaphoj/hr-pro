@@ -9,10 +9,10 @@
             <form method="POST" action="{{ route('profile.update') }}">
                 @csrf
                 @method('PUT')
-                <div class="field" style="margin-bottom:16px;">
+                <div class="field mb-2">
                     <x-input name="name" label="ชื่อ–นามสกุล" :value="$user->name" :required="true" />
                 </div>
-                <div class="field" style="margin-bottom:16px;">
+                <div class="field mb-2">
                     <x-input name="email" type="email" label="อีเมล" :value="$user->email" :required="true" />
                 </div>
                 <x-button type="submit" icon="check">บันทึกข้อมูล</x-button>
@@ -23,13 +23,13 @@
             <form method="POST" action="{{ route('profile.password') }}">
                 @csrf
                 @method('PUT')
-                <div style="margin-bottom:16px;">
+                <div class="mb-2">
                     <x-input name="current_password" type="password" label="รหัสผ่านปัจจุบัน" :required="true" autocomplete="current-password" />
                 </div>
-                <div style="margin-bottom:16px;">
+                <div class="mb-2">
                     <x-input name="password" type="password" label="รหัสผ่านใหม่" :required="true" hint="อย่างน้อย 8 ตัวอักษร ประกอบด้วยตัวอักษรและตัวเลข" autocomplete="new-password" />
                 </div>
-                <div style="margin-bottom:16px;">
+                <div class="mb-2">
                     <x-input name="password_confirmation" type="password" label="ยืนยันรหัสผ่านใหม่" :required="true" autocomplete="new-password" />
                 </div>
                 <x-button type="submit" variant="secondary" icon="lock">เปลี่ยนรหัสผ่าน</x-button>
@@ -38,7 +38,7 @@
     </div>
 
     @if($employee)
-        <div style="margin-top:18px;">
+        <div class="section-gap">
             <x-card title="ข้อมูลพนักงานที่เชื่อมโยง" subtitle="ข้อมูลนี้จัดการโดยฝ่ายบุคคล">
                 <dl class="dl">
                     <dt>รหัสพนักงาน</dt><dd>{{ $employee->employee_code }}</dd>

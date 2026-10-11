@@ -1,9 +1,9 @@
 @php $user = auth()->user(); @endphp
 <aside class="sidebar" id="sidebar">
     <div class="sidebar__brand">
-        <span class="logo">HR</span>
+        @include('partials.brand-mark')
         <span>
-            <b>HR PRO</b>
+            <b>{{ config('app.name') }}</b>
             <small>{{ config('hrpro.company_name') }}</small>
         </span>
     </div>
@@ -28,7 +28,11 @@
 
         <div class="nav__group">{{ __('nav.leave_time') }}</div>
         <x-nav-link :href="route('leave-requests.index')" pattern="leave-requests.*" icon="calendar">{{ __('nav.my_leave') }}</x-nav-link>
+        <x-nav-link :href="route('time-clock.show')" pattern="time-clock.*" icon="map-pin">{{ __('nav.time_clock') }}</x-nav-link>
         <x-nav-link :href="route('attendance.index')" pattern="attendance.*" icon="clock">{{ __('nav.attendance') }}</x-nav-link>
+        @can('work-locations.view')
+            <x-nav-link :href="route('work-locations.index')" pattern="work-locations.*" icon="target">{{ __('nav.work_locations') }}</x-nav-link>
+        @endcan
         @can('leave-approvals.view')
             <x-nav-link :href="route('leave-approvals.index')" pattern="leave-approvals.*" icon="check-circle">{{ __('nav.leave_approvals') }}</x-nav-link>
         @endcan
@@ -75,11 +79,19 @@
             @endcan
         @endif
 
+        {{-- Open to every account: the hub shows each person what their roles let them change. --}}
+        <x-nav-link :href="route('settings.index')" pattern="settings.index|settings.system.*|settings.appearance.*" icon="sliders">{{ __('nav.settings') }}</x-nav-link>
+
         <div class="nav__group">{{ __('nav.language') }}</div>
         <div class="nav__lang">
             <a href="{{ route('locale.update', 'th') }}" class="nav__lang-btn {{ app()->getLocale() === 'th' ? 'is-active' : '' }}">ไทย</a>
             <a href="{{ route('locale.update', 'en') }}" class="nav__lang-btn {{ app()->getLocale() === 'en' ? 'is-active' : '' }}">EN</a>
         </div>
     </nav>
+
+    <button type="button" class="sidebar__collapse" data-toggle="rail" aria-label="ย่อ/ขยายเมนู">
+        <x-icon name="chevron-left" />
+        <span>ย่อเมนู</span>
+    </button>
 </aside>
 <div class="scrim" id="scrim"></div>
