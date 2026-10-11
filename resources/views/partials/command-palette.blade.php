@@ -22,6 +22,7 @@
         $page('การลาของฉัน', 'leave-requests.index', 'calendar', 'my leave balance วันลา'),
         $page('ปฏิทินวันลา', 'leave-calendar.index', 'grid', 'calendar who is away ใครลา'),
         $page('ประวัติการลงเวลา', 'attendance.index', 'clock', 'attendance history timesheet'),
+        $user->employee ? $page('สลิปเงินเดือนของฉัน', 'my-payslips.index', 'wallet', 'my payslip salary สลิป เงินเดือน ภาษี') : null,
         $page('อนุมัติการลา', 'leave-approvals.index', 'check-circle', 'approve approvals', 'leave-approvals.view'),
         $page('พนักงาน', 'employees.index', 'users', 'employees staff people', 'employees.view'),
         $page('แผนก', 'departments.index', 'building', 'departments', 'departments.view'),

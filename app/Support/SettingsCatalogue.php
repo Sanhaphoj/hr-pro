@@ -172,7 +172,29 @@ final class SettingsCatalogue
                         'fields' => [
                             'social_security_enabled' => ['label' => 'หักเงินสมทบประกันสังคม', 'type' => 'toggle', 'config' => 'hrpro.payroll.social_security.enabled'],
                             'social_security_rate' => ['label' => 'อัตราเงินสมทบ', 'type' => 'number', 'unit' => '%', 'step' => '0.01', 'config' => 'hrpro.payroll.social_security.rate', 'rules' => ['required', 'numeric', 'between:0,20'], 'depends' => ['social_security_enabled' => '1']],
-                            'social_security_wage_cap' => ['label' => 'ฐานค่าจ้างสูงสุด', 'type' => 'number', 'unit' => 'บาท', 'step' => '0.01', 'config' => 'hrpro.payroll.social_security.wage_cap', 'rules' => ['required', 'numeric', 'between:0,1000000'], 'depends' => ['social_security_enabled' => '1'], 'hint' => 'หัก = (เงินเดือนหรือฐานนี้ แล้วแต่ค่าใดต่ำกว่า) × อัตรา · 0 = ไม่มีเพดาน · ปรับตามประกาศสำนักงานประกันสังคม'],
+                            'social_security_wage_cap' => ['label' => 'ฐานค่าจ้างสูงสุด', 'type' => 'number', 'unit' => 'บาท', 'step' => '0.01', 'config' => 'hrpro.payroll.social_security.wage_cap', 'rules' => ['required', 'numeric', 'between:0,1000000'], 'depends' => ['social_security_enabled' => '1'], 'hint' => 'หัก = (ค่าจ้างหรือฐานนี้ แล้วแต่ค่าใดต่ำกว่า) × อัตรา · 0 = ไม่มีเพดาน · ปรับตามประกาศสำนักงานประกันสังคม'],
+                        ],
+                    ],
+                    [
+                        'title' => 'ค่าล่วงเวลา (OT)',
+                        'description' => 'กรอกชั่วโมง OT ในสลิปฉบับร่าง ระบบคำนวณเงินให้',
+                        'fields' => [
+                            'hours_per_day' => ['label' => 'ชั่วโมงทำงานต่อวัน', 'type' => 'number', 'unit' => 'ชั่วโมง', 'step' => '0.5', 'config' => 'hrpro.payroll.hours_per_day', 'rules' => ['required', 'numeric', 'between:1,12'], 'hint' => 'ค่าจ้างต่อชั่วโมง = เงินเดือน ÷ จำนวนวันต่อเดือน ÷ ค่านี้'],
+                            'overtime_rate' => ['label' => 'อัตราค่าล่วงเวลา', 'type' => 'number', 'unit' => 'เท่า', 'step' => '0.1', 'config' => 'hrpro.payroll.overtime_rate', 'rules' => ['required', 'numeric', 'between:1,5'], 'hint' => 'กฎหมายคุ้มครองแรงงานกำหนดไม่น้อยกว่า 1.5 เท่าสำหรับวันทำงานปกติ'],
+                        ],
+                    ],
+                    [
+                        'title' => 'ภาษีเงินได้หัก ณ ที่จ่าย',
+                        'fields' => [
+                            'withholding_tax_enabled' => ['label' => 'หักภาษี ณ ที่จ่ายทุกงวด', 'type' => 'toggle', 'config' => 'hrpro.payroll.withholding_tax.enabled'],
+                            'withholding_tax_personal_allowance' => ['label' => 'ค่าลดหย่อนส่วนตัว', 'type' => 'number', 'unit' => 'บาท/ปี', 'config' => 'hrpro.payroll.withholding_tax.personal_allowance', 'rules' => ['required', 'numeric', 'between:0,1000000'], 'depends' => ['withholding_tax_enabled' => '1'], 'hint' => 'ประมาณการแบบเฉลี่ย 12 เดือน: หักค่าใช้จ่าย 50% (ไม่เกิน 100,000) ค่าลดหย่อนนี้ ประกันสังคม และกองทุนสำรองเลี้ยงชีพ แล้วคิดภาษีอัตราก้าวหน้า ÷ 12'],
+                        ],
+                    ],
+                    [
+                        'title' => 'กองทุนสำรองเลี้ยงชีพ',
+                        'fields' => [
+                            'provident_fund_enabled' => ['label' => 'หักเงินสะสมกองทุนสำรองเลี้ยงชีพ', 'type' => 'toggle', 'config' => 'hrpro.payroll.provident_fund.enabled'],
+                            'provident_fund_rate' => ['label' => 'อัตราเงินสะสมของพนักงาน', 'type' => 'number', 'unit' => '%', 'step' => '0.5', 'config' => 'hrpro.payroll.provident_fund.rate', 'rules' => ['required', 'numeric', 'between:2,15'], 'depends' => ['provident_fund_enabled' => '1'], 'hint' => 'ตามกฎหมาย 2–15% ของค่าจ้าง'],
                         ],
                     ],
                 ],

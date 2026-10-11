@@ -31,6 +31,9 @@
         <x-nav-link :href="route('leave-calendar.index')" pattern="leave-calendar.*" icon="grid">{{ __('nav.leave_calendar') }}</x-nav-link>
         <x-nav-link :href="route('time-clock.show')" pattern="time-clock.*" icon="map-pin">{{ __('nav.time_clock') }}</x-nav-link>
         <x-nav-link :href="route('attendance.index')" pattern="attendance.*" icon="clock">{{ __('nav.attendance') }}</x-nav-link>
+        @if($user->employee)
+            <x-nav-link :href="route('my-payslips.index')" pattern="my-payslips.*" icon="wallet">{{ __('nav.my_payslips') }}</x-nav-link>
+        @endif
         @can('work-locations.view')
             <x-nav-link :href="route('work-locations.index')" pattern="work-locations.*" icon="target">{{ __('nav.work_locations') }}</x-nav-link>
         @endcan

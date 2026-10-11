@@ -108,8 +108,10 @@
         toastStack = document.createElement('div');
         toastStack.className = 'toast-stack';
         toastStack.setAttribute('aria-live', 'polite');
-        document.body.appendChild(toastStack);
     }
+    // Out of .content, whose entry animation would otherwise become the
+    // containing block for these fixed-position toasts.
+    document.body.appendChild(toastStack);
 
     function dismissToast(el) {
         el.classList.add('is-leaving');

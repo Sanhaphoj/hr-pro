@@ -13,6 +13,7 @@ use App\Http\Controllers\ExportController;
 use App\Http\Controllers\JobPostingController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\ManifestController;
+use App\Http\Controllers\MyPayslipController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\PerformanceReviewController;
@@ -152,7 +153,12 @@ Route::middleware(['auth', 'active', 'password.changed'])->group(function () {
     Route::get('/payroll/print', [PayrollController::class, 'printRegister'])->name('payroll.print-register');
     Route::get('/payroll/{payroll}', [PayrollController::class, 'show'])->name('payroll.show');
     Route::get('/payroll/{payroll}/print', [PayrollController::class, 'printSlip'])->name('payroll.print');
+    Route::put('/payroll/{payroll}', [PayrollController::class, 'update'])->name('payroll.update');
     Route::post('/payroll/{payroll}/finalize', [PayrollController::class, 'finalize'])->name('payroll.finalize');
+
+    // Self-service: one's own confirmed payslips, no payroll permission needed.
+    Route::get('/my/payslips', [MyPayslipController::class, 'index'])->name('my-payslips.index');
+    Route::get('/my/payslips/{payroll}', [MyPayslipController::class, 'print'])->name('my-payslips.print');
 
     Route::get('/recruitment', [JobPostingController::class, 'index'])->name('recruitment.index');
     Route::get('/recruitment/create', [JobPostingController::class, 'create'])->name('recruitment.create');
@@ -186,6 +192,8 @@ Route::middleware(['auth', 'active', 'password.changed'])->group(function () {
     // --- Exports (CSV) ---
     Route::get('/export/employees', [ExportController::class, 'employees'])->name('export.employees');
     Route::get('/export/payroll', [ExportController::class, 'payroll'])->name('export.payroll');
+    Route::get('/export/payroll/pnd1', [ExportController::class, 'pnd1'])->name('export.pnd1');
+    Route::get('/export/payroll/sso', [ExportController::class, 'socialSecurity'])->name('export.sso');
 
     // --- Language switch ---
     Route::get('/locale/{locale}', [LocaleController::class, 'update'])->name('locale.update');

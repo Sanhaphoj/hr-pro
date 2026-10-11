@@ -2077,3 +2077,20 @@ kbd {
 @media print {
     .topbar__search, .toast-stack, .navbar-progress, .cmdk, .viz-tip, .viz__table { display: none !important; }
 }
+
+
+/* ---------- On-screen payslip ---------- */
+.payslip { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.payslip .table td, .payslip .table th { padding: 9px 4px; }
+.payslip .table th:first-child, .payslip .table td:first-child { padding-left: 0; }
+.payslip .table th:last-child, .payslip .table td:last-child { padding-right: 0; }
+.payslip__total td { font-weight: 700; color: var(--c-text); border-top: 1px solid var(--c-border-strong); }
+.payslip .table tbody tr:hover { background: none; }
+.payslip__net {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+    margin-top: 16px; padding: 16px 18px; border-radius: var(--radius-sm);
+    background: var(--c-brand-soft); color: var(--c-brand-700);
+}
+.payslip__net span { font-weight: 600; }
+.payslip__net b { font-size: 26px; letter-spacing: -.02em; color: var(--c-text); }
+@media (max-width: 640px) { .payslip { grid-template-columns: 1fr; } }

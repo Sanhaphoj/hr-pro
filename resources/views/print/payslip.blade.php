@@ -4,7 +4,8 @@
     $employee = $payroll->employee;
     $periodDate = \Illuminate\Support\Carbon::create($payroll->period_year, $payroll->period_month, 1);
     $period = thai_month($payroll->period_month).' '.($payroll->period_year + 543);
-    $earnings = (float) $payroll->base_salary + (float) $payroll->allowances;
+    $earnings = $payroll->earnings;
+    $lines = $payroll->deductionLines();
     $draft = $payroll->status !== 'finalized';
     $money = fn ($value) => number_format((float) $value, 2);
     // Settings → Payroll. A month shorter than the pay day pays on its last day.
@@ -14,7 +15,7 @@
 
 @section('title', 'สลิปเงินเดือน · '.$period)
 @section('filename', sprintf('สลิปเงินเดือน_%s_%d-%02d', $employee?->employee_code ?? $payroll->id, $payroll->period_year + 543, $payroll->period_month))
-@section('back', route('payroll.show', $payroll))
+@section('back', $back ?? route('payroll.show', $payroll))
 
 @section('content')
     <article class="sheet">
@@ -52,7 +53,9 @@
                     <thead><tr><th>รายได้</th><th class="num">จำนวนเงิน</th></tr></thead>
                     <tbody>
                         <tr><td>เงินเดือน</td><td class="num">{{ $money($payroll->base_salary) }}</td></tr>
+                        <tr><td>ค่าล่วงเวลา{{ (float) $payroll->overtime_hours > 0 ? ' ('.rtrim(rtrim(number_format((float) $payroll->overtime_hours, 2), '0'), '.').' ชม.)' : '' }}</td><td class="num">{{ $money($payroll->overtime_pay) }}</td></tr>
                         <tr><td>เบี้ยเลี้ยง / ค่าตอบแทนอื่น</td><td class="num">{{ $money($payroll->allowances) }}</td></tr>
+                        @for($i = 3; $i < max(3, count($lines)); $i++)<tr class="is-blank"><td>—</td><td></td></tr>@endfor
                     </tbody>
                     <tfoot><tr><td>รวมรายได้</td><td class="num">{{ $money($earnings) }}</td></tr></tfoot>
                 </table>
@@ -60,8 +63,11 @@
                 <table class="doc-table">
                     <thead><tr><th>รายการหัก</th><th class="num">จำนวนเงิน</th></tr></thead>
                     <tbody>
-                        <tr><td>ลาไม่รับค่าจ้าง / ขาดงาน และอื่น ๆ</td><td class="num">{{ $money($payroll->deductions) }}</td></tr>
-                        <tr class="is-blank"><td>—</td><td></td></tr>
+                        @foreach($lines as $label => $amount)
+                            <tr><td>{{ $label }}</td><td class="num">{{ $money($amount) }}</td></tr>
+                        @endforeach
+                        {{-- Pad to the earnings column so the two tables end level. --}}
+                        @for($i = count($lines); $i < 3; $i++)<tr class="is-blank"><td>—</td><td></td></tr>@endfor
                     </tbody>
                     <tfoot><tr><td>รวมรายการหัก</td><td class="num">{{ $money($payroll->deductions) }}</td></tr></tfoot>
                 </table>
@@ -81,8 +87,9 @@
             <div class="doc-stats">
                 <div class="doc-stat"><span>รายได้สะสม</span><b>{{ $money($ytd['earnings']) }}</b></div>
                 <div class="doc-stat"><span>รายการหักสะสม</span><b>{{ $money($ytd['deductions']) }}</b></div>
+                <div class="doc-stat"><span>ภาษีหัก ณ ที่จ่ายสะสม</span><b>{{ $money($ytd['tax']) }}</b></div>
+                <div class="doc-stat"><span>ประกันสังคมสะสม</span><b>{{ $money($ytd['sso']) }}</b></div>
                 <div class="doc-stat"><span>เงินได้สุทธิสะสม</span><b>{{ $money($ytd['net']) }}</b></div>
-                <div class="doc-stat"><span>จำนวนงวด</span><b>{{ $ytd['count'] }} <small>งวด</small></b></div>
             </div>
         </section>
 

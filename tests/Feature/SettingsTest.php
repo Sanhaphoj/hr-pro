@@ -419,15 +419,16 @@ class SettingsTest extends TestCase
             'hrpro.payroll.social_security.enabled' => true,
             'hrpro.payroll.social_security.rate' => 5,
             'hrpro.payroll.social_security.wage_cap' => 15000,
+            'hrpro.payroll.withholding_tax.enabled' => false,   // SSO alone here
         ]);
         Employee::factory()->create(['base_salary' => 30000]);
 
         app(PayrollService::class)->generateForPeriod(2026, 9);
 
         $row = Payroll::first();
+        $this->assertEquals(750.0, (float) $row->social_security);
         $this->assertEquals(750.0, (float) $row->deductions);
         $this->assertEquals(29250.0, (float) $row->net_pay);
-        $this->assertStringContainsString('ประกันสังคม', (string) $row->note);
     }
 
     public function test_the_password_policy_follows_the_settings(): void

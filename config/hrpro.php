@@ -93,6 +93,18 @@ return [
             'rate' => 5,
             'wage_cap' => 15000,
         ],
+        // Overtime: hourly wage = monthly ÷ days_per_month ÷ hours_per_day.
+        'hours_per_day' => 8,
+        'overtime_rate' => 1.5,
+        'provident_fund' => [
+            'enabled' => false,
+            'rate' => 3,
+        ],
+        // Monthly withholding by the averaging method (see PayrollService).
+        'withholding_tax' => [
+            'enabled' => true,
+            'personal_allowance' => 60000,
+        ],
     ],
 
     'documents' => [
