@@ -24,7 +24,8 @@ class AuthTest extends TestCase
             'password' => 'password',
         ]);
 
-        $response->assertRedirect(route('dashboard'));
+        // Signing in lands on the time clock, not the dashboard.
+        $response->assertRedirect(route('time-clock.show'));
         $this->assertAuthenticatedAs($user);
         $this->assertNotNull($user->fresh()->last_login_at);
     }

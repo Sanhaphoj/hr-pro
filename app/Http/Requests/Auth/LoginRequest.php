@@ -43,7 +43,8 @@ class LoginRequest extends FormRequest
         $this->ensureIsNotRateLimited();
 
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+            // Settings → Security: how long a lockout lasts.
+            RateLimiter::hit($this->throttleKey(), max(1, (int) config('hrpro.security.lockout_minutes', 1)) * 60);
 
             throw ValidationException::withMessages([
                 'email' => 'อีเมลหรือรหัสผ่านไม่ถูกต้อง',
@@ -60,7 +61,7 @@ class LoginRequest extends FormRequest
      */
     public function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        if (! RateLimiter::tooManyAttempts($this->throttleKey(), max(1, (int) config('hrpro.security.login_max_attempts', 5)))) {
             return;
         }
 
