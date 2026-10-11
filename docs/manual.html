@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>คู่มือสร้างระบบ HR PRO (ฉบับละเอียด)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#2563eb; --primary-dark:#1e3a5f; --primary-soft:#eff4ff;
+    --bg:#f4f5f9; --surface:#ffffff; --text:#1f2937; --muted:#6b7280;
+    --border:#e5e7eb; --code-bg:#0f172a; --code-text:#e2e8f0;
+    --green:#16a34a; --amber:#b45309; --radius:12px;
+    --shadow:0 1px 3px rgba(0,0,0,.07),0 8px 24px rgba(15,23,42,.04);
+    --font:'Inter','Noto Sans Thai',sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.7;font-size:15.5px}
+  a{color:var(--primary);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* layout */
+  .wrap{display:grid;grid-template-columns:288px 1fr;max-width:1320px;margin:0 auto;gap:0}
+  /* sidebar TOC */
+  .toc{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;
+       background:var(--surface);border-right:1px solid var(--border);padding:26px 20px}
+  .toc .brand{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .toc .logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+       color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px}
+  .toc .brand b{font-size:16px}
+  .toc .sub{color:var(--muted);font-size:12px;margin:0 0 18px 0}
+  .toc nav a{display:block;padding:6px 10px;border-radius:8px;color:var(--text);font-size:13.5px;font-weight:500}
+  .toc nav a:hover{background:var(--primary-soft);text-decoration:none}
+  .toc nav a.small{padding-left:24px;font-weight:400;color:var(--muted);font-size:13px}
+  .toc nav .grp{margin-top:14px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:0 10px}
+
+  /* content */
+  main{padding:48px 56px 120px;min-width:0}
+  .hero{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;
+        border-radius:var(--radius);padding:36px 40px;margin-bottom:34px;box-shadow:var(--shadow)}
+  .hero h1{margin:0 0 8px;font-size:30px;font-weight:700}
+  .hero p{margin:4px 0;opacity:.92}
+  .hero .pills{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+  .pill{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);
+        padding:5px 12px;border-radius:999px;font-size:12.5px;font-weight:500}
+
+  h2{font-size:23px;margin:46px 0 14px;padding-top:14px;border-top:1px solid var(--border)}
+  h2 .num{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:8px;
+       background:var(--primary);color:#fff;font-size:14px;margin-right:10px;vertical-align:middle}
+  h3{font-size:18px;margin:28px 0 10px;color:var(--primary-dark)}
+  h4{font-size:15.5px;margin:18px 0 8px}
+  p{margin:10px 0}
+  ul,ol{margin:10px 0;padding-left:22px}
+  li{margin:5px 0}
+  hr{border:none;border-top:1px solid var(--border);margin:30px 0}
+
+  /* code */
+  code{font-family:var(--mono);background:#eef1f6;color:#b4256b;padding:2px 6px;border-radius:6px;font-size:.86em}
+  pre{background:var(--code-bg);color:var(--code-text);border-radius:var(--radius);padding:18px 20px;
+      margin:14px 0;font-size:13px;line-height:1.6;box-shadow:var(--shadow);
+      white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
+  pre code{background:none;color:inherit;padding:0;font-size:13px;white-space:inherit}
+  .lang{display:block;color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;font-family:var(--font)}
+
+  /* tables */
+  table{width:100%;border-collapse:collapse;margin:16px 0;background:var(--surface);
+        border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);font-size:14px}
+  th,td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+  th{background:var(--primary-soft);color:var(--primary-dark);font-weight:600;font-size:13px}
+  tr:last-child td{border-bottom:none}
+  td code{font-size:.82em}
+
+  /* callouts */
+  .note{border-radius:var(--radius);padding:14px 18px;margin:16px 0;border-left:4px solid;background:var(--surface);box-shadow:var(--shadow)}
+  .note.tip{border-color:var(--primary);background:var(--primary-soft)}
+  .note.warn{border-color:var(--amber);background:#fff8ec}
+  .note.ok{border-color:var(--green);background:#f0fdf4}
+  .note b{display:block;margin-bottom:2px}
+
+  /* misc */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:6px 22px;margin:14px 0;box-shadow:var(--shadow)}
+  .checklist{list-style:none;padding-left:0}
+  .checklist li{padding-left:30px;position:relative}
+  .checklist li::before{content:"☐";position:absolute;left:4px;color:var(--primary);font-size:18px}
+  .lifecycle{font-family:var(--mono);font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere;background:var(--primary-soft);
+       border:1px dashed var(--primary);border-radius:var(--radius);padding:16px 20px;color:var(--primary-dark)}
+  .footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--border);color:var(--muted);font-size:13px;text-align:center}
+
+  @media(max-width:900px){
+    .wrap{grid-template-columns:1fr}
+    .toc{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border)}
+    main{padding:28px 20px 80px}
+  }
+
+  /* ---- print / PDF ---- */
+  @media print{
+    @page{margin:14mm 12mm}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    body{background:#fff;font-size:11px;line-height:1.55}
+    .wrap{display:block;max-width:none}
+    .toc{display:none}
+    main{padding:0}
+    .hero{box-shadow:none;border-radius:10px}
+    h2{font-size:18px;border-top:none;break-after:avoid}
+    h3,h4{break-after:avoid}
+    pre,table,.note,.card,.lifecycle,h2,h3{break-inside:avoid}
+    pre{box-shadow:none;font-size:10px;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
+    table,.card,.note{box-shadow:none;border:1px solid var(--border)}
+    a{color:inherit;text-decoration:none}
+    .footer{break-before:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===================== SIDEBAR TOC ===================== -->
+  <aside class="toc">
+    <div class="brand"><div class="logo">HR</div><b>HR PRO</b></div>
+    <p class="sub">คู่มือสร้างระบบ ฉบับละเอียด</p>
+    <nav>
+      <a href="#overview">1 · ภาพรวม &amp; ปรัชญา</a>
+      <a href="#prereq">2 · เตรียมเครื่องมือ</a>
+      <div class="grp">การลงมือสร้าง</div>
+      <a href="#p0">Phase 0 · ตั้งโครงโปรเจกต์</a>
+      <a href="#p1">Phase 1 · ฐานข้อมูล &amp; Models</a>
+      <a href="#p2">Phase 2 · เข้าสู่ระบบ (Auth)</a>
+      <a href="#p3">Phase 3 · สิทธิ์ (RBAC)</a>
+      <a href="#p4">Phase 4 · Design System</a>
+      <a href="#p5">Phase 5 · โมดูลหลัก (MVP)</a>
+      <a href="#p6">Phase 6 · โมดูลต่อยอด</a>
+      <a href="#p7">Phase 7 · Seeder</a>
+      <a href="#p8">Phase 8 · การทดสอบ</a>
+      <a href="#p9">Phase 9 · Deploy</a>
+      <div class="grp">อ้างอิง</div>
+      <a href="#prompts">ชุดพรอมต์สำเร็จรูป</a>
+      <a href="#checklist">Checklist</a>
+    </nav>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <main>
+    <div class="hero">
+      <h1>🏗️ คู่มือสร้างระบบ HR PRO ตั้งแต่ศูนย์</h1>
+      <p>สอนสร้างระบบ HRIS ทีละขั้น — เขียนให้คนเพิ่งเริ่ม Laravel ก็ตามได้ อธิบายทั้ง <b>ทำอะไร · ทำยังไง · ทำไม</b></p>
+      <p>ทุก Phase มี “พรอมต์สำเร็จรูป” ให้ก็อปไปสั่ง AI สร้างต่อได้</p>
+      <div class="pills">
+        <span class="pill">Laravel 12</span><span class="pill">Blade ล้วน</span>
+        <span class="pill">RBAC เขียนเอง</span><span class="pill">ไม่มี Node build</span>
+        <span class="pill">MySQL / SQLite</span><span class="pill">Docker · Render</span>
+      </div>
+    </div>
+
+    <!-- 1 -->
+    <h2 id="overview"><span class="num">1</span>ภาพรวม &amp; ปรัชญาการออกแบบ</h2>
+    <p><b>HR PRO</b> คือระบบบริหารทรัพยากรบุคคล (HRIS) สำหรับองค์กร 40–200 คน มีโมดูลครบ: พนักงาน, การลา, ลงเวลา, เงินเดือน, สรรหา, ประเมินผล, ฝึกอบรม, เอกสาร ฯลฯ</p>
+
+    <h3>Stack ที่ใช้ และเหตุผล</h3>
+    <table>
+      <tr><th>ส่วน</th><th>เลือกใช้</th><th>ทำไม</th></tr>
+      <tr><td>ภาษา/เฟรมเวิร์ก</td><td><b>PHP 8.2+ / Laravel 12</b></td><td>ครบเครื่อง เอกสารดี deploy ง่าย</td></tr>
+      <tr><td>หน้าเว็บ (View)</td><td><b>Blade ล้วน (Server-rendered)</b></td><td><b>ไม่ต้อง build ฝั่ง Node</b> — เขียนเสร็จรันได้เลย ลดความซับซ้อน</td></tr>
+      <tr><td>หน้าตา (CSS)</td><td><b>CSS เขียนมือ</b> ใน <code>public/css/app.css</code></td><td>ควบคุมได้ 100% ไม่พึ่ง Tailwind/Bootstrap</td></tr>
+      <tr><td>ฐานข้อมูล</td><td><b>MySQL</b> (โปรดักชัน) / <b>SQLite</b> (เดโม/เทสต์)</td><td>สลับด้วยการแก้ <code>.env</code> บรรทัดเดียว</td></tr>
+      <tr><td>สิทธิ์ผู้ใช้</td><td><b>RBAC เขียนเอง</b> (ไม่ใช้ Spatie)</td><td>เข้าใจกลไกเต็มที่ ตารางน้อย ปรับแต่งง่าย</td></tr>
+    </table>
+
+    <h3>หลักคิดสำคัญ 5 ข้อ</h3>
+    <ol>
+      <li><b>ทุกโมดูลหน้าตาเหมือนกันหมด</b> — Controller + FormRequest + Service + Blade (index/create/edit) ทำโมดูลแรกเป็น โมดูลที่เหลือคือ “ก็อปแล้วเปลี่ยนชื่อ”</li>
+      <li><b>Logic หนัก ๆ อยู่ใน Service ไม่ใช่ Controller</b> — Controller แค่รับ request → เรียก Service → ส่งไป View</li>
+      <li><b>สิทธิ์เช็ค 2 ชั้น</b> — middleware กันที่ route + <code>@can</code> ซ่อน/โชว์ปุ่มใน View</li>
+      <li><b>ทุกการกระทำสำคัญถูกบันทึก (Audit Log)</b></li>
+      <li><b>UI ประกอบจาก Blade Component</b> (<code>&lt;x-button&gt;</code>, <code>&lt;x-card&gt;</code>…) เขียนครั้งเดียวใช้ซ้ำทั้งระบบ</li>
+    </ol>
+
+    <p>โครงสร้างคำขอ 1 ครั้ง (Request lifecycle):</p>
+    <div class="lifecycle">Browser → route (web.php)
+        → middleware (auth → active → permission)
+        → Controller (รับ input, ตรวจสิทธิ์ละเอียด)
+        → FormRequest (validate)
+        → Service (business logic)
+        → Model/DB (Eloquent)
+        → Blade View (+ Components) → HTML กลับไป Browser</div>
+
+    <!-- 2 -->
+    <h2 id="prereq"><span class="num">2</span>เตรียมเครื่องมือ</h2>
+    <ul>
+      <li><b>PHP 8.2 ขึ้นไป</b> (<code>php -v</code>) พร้อม extension: <code>pdo_mysql</code>, <code>pdo_sqlite</code>, <code>mbstring</code>, <code>openssl</code>, <code>zip</code></li>
+      <li><b>Composer</b> (<code>composer -V</code>)</li>
+      <li><b>MySQL 8</b> หรือใช้ SQLite ไปก่อน (ไม่ต้องติดตั้งอะไรเพิ่ม)</li>
+      <li><b>Git</b></li>
+    </ul>
+    <div class="note tip"><b>💡 ไม่ต้องมี Node.js/npm</b>เพราะระบบนี้ไม่มีขั้นตอน build ฝั่งหน้าเว็บ</div>
+
+    <!-- P0 -->
+    <h2 id="p0"><span class="num">0</span>Phase 0 — ตั้งโครงโปรเจกต์</h2>
+    <p><b>เป้าหมาย:</b> ได้ Laravel เปล่า ๆ ที่เปิดในเบราว์เซอร์ได้</p>
+    <pre><span class="lang">bash</span><code># 1) สร้างโปรเจกต์ Laravel ใหม่
+composer create-project laravel/laravel hr-pro
+cd hr-pro
+
+# 2) ตั้งค่า .env แล้วสร้าง key
+cp .env.example .env
+php artisan key:generate
+
+# 3) ลองเปิดเซิร์ฟเวอร์
+php artisan serve      # http://localhost:8000</code></pre>
+    <p>แก้ <code>.env</code> ส่วนฐานข้อมูล — เริ่มด้วย SQLite เพื่อความง่าย:</p>
+    <pre><span class="lang">dotenv</span><code>DB_CONNECTION=sqlite
+# ลบ/คอมเมนต์ DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD</code></pre>
+    <pre><span class="lang">bash</span><code># สร้างไฟล์ฐานข้อมูลเปล่า
+touch database/database.sqlite                     # macOS/Linux
+New-Item database/database.sqlite -ItemType File   # Windows PowerShell</code></pre>
+    <p>สร้าง <code>config/hrpro.php</code> เก็บค่าคงที่ของระบบ (เรียกด้วย <code>config('hrpro.xxx')</code>):</p>
+    <pre><span class="lang">php</span><code>&lt;?php
+return [
+    'per_page' =&gt; 15,                          // จำนวนแถวต่อหน้าในตาราง
+    'company_name' =&gt; env('HRPRO_COMPANY_NAME', 'HR PRO Co., Ltd.'),
+    'work_start' =&gt; env('HRPRO_WORK_START', '09:00'),   // ใช้ตัดสินว่ามาสาย
+    'work_end' =&gt; env('HRPRO_WORK_END', '18:00'),
+    'late_grace_minutes' =&gt; env('HRPRO_LATE_GRACE_MINUTES', 15),
+    'default_locale' =&gt; env('HRPRO_DEFAULT_LOCALE', 'th'),
+];</code></pre>
+
+    <!-- P1 -->
+    <h2 id="p1"><span class="num">1</span>Phase 1 — ฐานข้อมูล &amp; Models</h2>
+    <p><b>เป้าหมาย:</b> ออกแบบตารางทั้งหมด + Model + ความสัมพันธ์ + Factory</p>
+
+    <h3>1.1 ลำดับ Migration สำคัญมาก ⚠️</h3>
+    <div class="note warn"><b>⚠️ ตารางที่ถูกอ้างอิง (parent) ต้องสร้างก่อนตารางที่อ้างถึง (child)</b>เพราะมี foreign key — ตั้งชื่อไฟล์ migration ให้เรียงตามลำดับนี้</div>
+    <div class="lifecycle">users  →  roles  →  permissions  →  permission_role  →  role_user
+       →  departments  →  positions  →  employees
+       →  leave_types  →  leave_requests  →  leave_balances
+       →  attendances  →  announcements  →  audit_logs  →  notifications
+   (Phase 2) →  payrolls, job_postings, candidates, performance_reviews,
+                training_courses, training_enrollments, documents, onboarding_tasks</div>
+
+    <h3>1.2 ตัวอย่าง migration (employees)</h3>
+    <pre><span class="lang">php</span><code>Schema::create('employees', function (Blueprint $table) {
+    $table-&gt;id();
+    $table-&gt;foreignId('user_id')-&gt;nullable()-&gt;constrained()-&gt;nullOnDelete();
+    $table-&gt;foreignId('department_id')-&gt;nullable()-&gt;constrained()-&gt;nullOnDelete();
+    $table-&gt;foreignId('position_id')-&gt;nullable()-&gt;constrained()-&gt;nullOnDelete();
+    $table-&gt;string('employee_code')-&gt;unique();
+    $table-&gt;string('first_name');
+    $table-&gt;string('last_name');
+    $table-&gt;string('email')-&gt;unique();
+    $table-&gt;string('status')-&gt;default('active');        // active | inactive | terminated
+    $table-&gt;string('employment_type')-&gt;default('full_time');
+    $table-&gt;date('hire_date')-&gt;nullable();
+    $table-&gt;decimal('base_salary', 12, 2)-&gt;nullable();
+    $table-&gt;softDeletes();                              // ลบแบบกู้คืนได้
+    $table-&gt;timestamps();
+});</code></pre>
+    <div class="note tip"><b>เคล็ดลับ</b>ใช้ <code>softDeletes()</code> กับข้อมูลคน/เอกสาร เพื่อให้ “ลบแล้วกู้คืนได้” ปลอดภัยกว่าลบจริง</div>
+
+    <h3>1.3 ตัวอย่าง Model + ความสัมพันธ์ (Employee)</h3>
+    <pre><span class="lang">php</span><code>class Employee extends Model
+{
+    use HasFactory, SoftDeletes;
+
+    protected $fillable = [
+        'user_id','department_id','position_id','employee_code',
+        'first_name','last_name','email','status','employment_type',
+        'hire_date','base_salary',
+    ];
+
+    protected function casts(): array
+    {
+        return ['hire_date' =&gt; 'date', 'base_salary' =&gt; 'decimal:2'];
+    }
+
+    // ----- ความสัมพันธ์ -----
+    public function user()         { return $this-&gt;belongsTo(User::class); }
+    public function department()   { return $this-&gt;belongsTo(Department::class); }
+    public function position()     { return $this-&gt;belongsTo(Position::class); }
+    public function leaveRequests(){ return $this-&gt;hasMany(LeaveRequest::class); }
+
+    // ----- accessor สะดวก ๆ -----
+    public function getFullNameAttribute(): string
+    {
+        return trim("{$this-&gt;first_name} {$this-&gt;last_name}");
+    }
+}</code></pre>
+
+    <h3>1.4 Factory (ข้อมูลปลอมไว้เทส/เดโม)</h3>
+    <pre><span class="lang">php</span><code>public function definition(): array
+{
+    return [
+        'employee_code' =&gt; 'EMP-'.fake()-&gt;unique()-&gt;numberBetween(100000, 999999),
+        'first_name' =&gt; fake()-&gt;firstName(),
+        'last_name' =&gt; fake()-&gt;lastName(),
+        'email' =&gt; fake()-&gt;unique()-&gt;safeEmail(),
+        'status' =&gt; 'active',
+        'employment_type' =&gt; 'full_time',
+        'hire_date' =&gt; fake()-&gt;dateTimeBetween('-5 years', 'now'),
+        'base_salary' =&gt; fake()-&gt;numberBetween(18000, 90000),
+    ];
+}</code></pre>
+    <pre><span class="lang">bash</span><code>php artisan migrate</code></pre>
+    <div class="card"><p><b>Model ทั้งหมด (21 ตัว):</b> User, Role, Permission, Department, Position, Employee, LeaveType, LeaveRequest, LeaveBalance, Attendance, Announcement, AuditLog, Notification, Payroll, JobPosting, Candidate, PerformanceReview, TrainingCourse, TrainingEnrollment, Document, OnboardingTask</p></div>
+
+    <!-- P2 -->
+    <h2 id="p2"><span class="num">2</span>Phase 2 — ระบบเข้าสู่ระบบ (Auth)</h2>
+    <p><b>เป้าหมาย:</b> หน้า login เอง (ไม่ใช้ scaffold สำเร็จรูป เพื่อควบคุมหน้าตา)</p>
+    <h3>2.1 Controller</h3>
+    <pre><span class="lang">php</span><code>class AuthenticatedSessionController extends Controller
+{
+    public function create() { return view('auth.login'); }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $credentials = $request-&gt;validate([
+            'email' =&gt; ['required','email'],
+            'password' =&gt; ['required'],
+        ]);
+
+        if (! Auth::attempt($credentials, $request-&gt;boolean('remember'))) {
+            return back()-&gt;withErrors(['email' =&gt; 'อีเมลหรือรหัสผ่านไม่ถูกต้อง'])-&gt;onlyInput('email');
+        }
+
+        $request-&gt;session()-&gt;regenerate();          // กัน session fixation
+        Auth::user()-&gt;update(['last_login_at' =&gt; now()]);
+        return redirect()-&gt;intended(route('dashboard'));
+    }
+
+    public function destroy(Request $request): RedirectResponse
+    {
+        Auth::logout();
+        $request-&gt;session()-&gt;invalidate();
+        $request-&gt;session()-&gt;regenerateToken();
+        return redirect()-&gt;route('login');
+    }
+}</code></pre>
+    <h3>2.2 Middleware “active” (กันบัญชีที่ถูกปิด)</h3>
+    <pre><span class="lang">php</span><code>public function handle(Request $request, Closure $next): Response
+{
+    if (auth()-&gt;check() &amp;&amp; ! auth()-&gt;user()-&gt;is_active) {
+        auth()-&gt;logout();
+        return redirect()-&gt;route('login')-&gt;withErrors(['email' =&gt; 'บัญชีนี้ถูกระงับการใช้งาน']);
+    }
+    return $next($request);
+}</code></pre>
+    <p>ลงทะเบียน alias ใน <code>bootstrap/app.php</code>:</p>
+    <pre><span class="lang">php</span><code>$middleware-&gt;alias([
+    'permission' =&gt; \App\Http\Middleware\EnsureUserHasPermission::class,
+    'active' =&gt; \App\Http\Middleware\EnsureUserIsActive::class,
+]);
+$middleware-&gt;redirectGuestsTo(fn () =&gt; route('login'));  // ยังไม่ล็อกอิน → หน้า login</code></pre>
+
+    <!-- P3 -->
+    <h2 id="p3"><span class="num">3</span>Phase 3 — สิทธิ์การใช้งาน (RBAC)</h2>
+    <p><b>เป้าหมาย:</b> ระบบ “บทบาท (Role) → สิทธิ์ (Permission)” ที่ปรับแต่งได้ผ่านหน้าจอ</p>
+    <h3>3.1 ตาราง (4 ตาราง)</h3>
+    <div class="lifecycle">roles            (id, slug, name, description, is_system)
+permissions      (id, name, group, description)
+permission_role  (permission_id, role_id)   ← M:N
+role_user        (role_id, user_id)         ← M:N</div>
+    <h3>3.2 รูปแบบชื่อสิทธิ์: <code>&lt;ทรัพยากร&gt;.&lt;การกระทำ&gt;</code></h3>
+    <p>เช่น <code>employees.view</code>, <code>employees.create</code>, <code>leave-approvals.approve</code>, <code>payroll.manage</code> — จัดกลุ่มด้วยคอลัมน์ <code>group</code></p>
+    <h3>3.3 เช็คสิทธิ์ใน Model + ผูก Gate</h3>
+    <pre><span class="lang">php — User.php</span><code>public function roles() { return $this-&gt;belongsToMany(Role::class)-&gt;withTimestamps(); }
+
+public function hasPermission(string $permission): bool
+{
+    return $this-&gt;roles()
+        -&gt;whereHas('permissions', fn ($q) =&gt; $q-&gt;where('name', $permission))
+        -&gt;exists();
+}</code></pre>
+    <pre><span class="lang">php — AppServiceProvider::boot()</span><code>// ทำให้ใช้ @can('employees.view') ใน Blade ได้
+Gate::before(function (User $user, string $ability) {
+    return $user-&gt;hasPermission($ability) ? true : null;
+});</code></pre>
+    <h3>3.4 Middleware ตรวจสิทธิ์ระดับ route</h3>
+    <pre><span class="lang">php</span><code>public function handle(Request $request, Closure $next, string $permission): Response
+{
+    abort_unless(auth()-&gt;user()?-&gt;hasPermission($permission), 403);
+    return $next($request);
+}</code></pre>
+    <h3>3.5 บทบาทมาตรฐาน 4 แบบ (seed ไว้ตั้งแต่ต้น)</h3>
+    <table>
+      <tr><th>บทบาท</th><th>slug</th><th>สิทธิ์</th></tr>
+      <tr><td>ผู้ดูแลระบบสูงสุด</td><td><code>super-admin</code></td><td>ทุกสิทธิ์ (<code>*</code>)</td></tr>
+      <tr><td>ผู้จัดการฝ่ายบุคคล</td><td><code>hr-manager</code></td><td>จัดการพนักงาน/ลา/ประกาศ/เงินเดือน…</td></tr>
+      <tr><td>หัวหน้างาน</td><td><code>manager</code></td><td>ดูทีม + อนุมัติการลา</td></tr>
+      <tr><td>พนักงาน</td><td><code>employee</code></td><td>บริการตนเอง (ลา/ลงเวลา/โปรไฟล์)</td></tr>
+    </table>
+
+    <!-- P4 -->
+    <h2 id="p4"><span class="num">4</span>Phase 4 — Design System (หน้าตาเว็บ)</h2>
+    <p><b>เป้าหมาย:</b> วางหน้าตากลาง (layout + สี + component) ก่อนทำโมดูล เพื่อให้ทุกหน้าหน้าตาเหมือนกัน</p>
+    <h3>4.1 Layout หลัก</h3>
+    <pre><span class="lang">blade — layouts/app.blade.php</span><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="th"&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta name="csrf-token" content="{{ csrf_token() }}"&gt;
+    &lt;title&gt;@yield('title','แดชบอร์ด') · {{ config('app.name') }}&lt;/title&gt;
+    &lt;link href="...Inter + Noto Sans Thai..." rel="stylesheet"&gt;
+    &lt;link rel="stylesheet" href="{{ asset('css/app.css') }}"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class="app"&gt;
+    @include('partials.sidebar')      {{-- เมนูซ้าย --}}
+    &lt;div class="main"&gt;
+      @include('partials.topbar')     {{-- แถบบน + ผู้ใช้ + แจ้งเตือน --}}
+      &lt;main class="content"&gt;
+        @include('partials.flash')    {{-- ข้อความแจ้งผล --}}
+        @yield('content')
+      &lt;/main&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;script src="{{ asset('js/app.js') }}" defer&gt;&lt;/script&gt;
+&lt;/body&gt;&lt;/html&gt;</code></pre>
+    <h3>4.2 ตัวแปรสี (Design Tokens) ใน <code>public/css/app.css</code></h3>
+    <p>วาง “สีหลักของระบบ” เป็นตัวแปร CSS ที่เดียว แก้ทีเดียวเปลี่ยนทั้งเว็บ:</p>
+    <pre><span class="lang">css</span><code>:root {
+    --color-primary: #2563eb;     /* น้ำเงินหลัก (ปุ่ม/แถบหัวข้อ/ลิงก์) */
+    --color-primary-dark: #1e3a5f;
+    --color-bg: #f4f5f9;          /* พื้นหลังหน้า */
+    --color-surface: #ffffff;     /* การ์ด/กล่อง */
+    --color-text: #1f2937;
+    --color-muted: #6b7280;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,.08);
+    --font: 'Inter','Noto Sans Thai',sans-serif;
+}
+body { background: var(--color-bg); color: var(--color-text); font-family: var(--font); }</code></pre>
+    <h3>4.3 Blade Components (หัวใจของความเร็ว)</h3>
+    <pre><span class="lang">blade — components/button.blade.php</span><code>@props(['variant' =&gt; 'primary', 'type' =&gt; 'button'])
+&lt;button type="{{ $type }}" {{ $attributes-&gt;merge(['class' =&gt; "btn btn-$variant"]) }}&gt;
+    {{ $slot }}
+&lt;/button&gt;</code></pre>
+    <pre><span class="lang">blade — ใช้งานจริง</span><code>&lt;x-button variant="primary"&gt;+ เพิ่มพนักงาน&lt;/x-button&gt;
+&lt;x-stat label="พนักงานทั้งหมด" value="47" /&gt;
+&lt;x-card&gt;...&lt;/x-card&gt;</code></pre>
+    <div class="card"><p><b>Component ทั้งชุด:</b> alert, badge, button, card, checkbox, empty, icon, input, nav-link, page-header, select, stat, status-badge, textarea</p></div>
+    <h3>4.4 Helper ฟังก์ชัน (<code>app/Support/helpers.php</code>)</h3>
+    <pre><span class="lang">php</span><code>initials('สมชาย ใจดี');   // → "สใ"  (ตัวย่อทำ avatar)
+thb(25000);               // → "฿25,000.00"
+avatar_color('user@x');   // → สี hex คงที่จากชื่อ (avatar ไม่ต้องมีรูป)</code></pre>
+    <pre><span class="lang">json — composer.json</span><code>"autoload": { "files": ["app/Support/helpers.php"] }</code></pre>
+
+    <!-- P5 -->
+    <h2 id="p5"><span class="num">5</span>Phase 5 — โมดูลหลัก (MVP) ทีละตัว</h2>
+    <p><b>เป้าหมาย:</b> ทำทีละโมดูล โดยทุกโมดูลใช้ pattern เดียวกัน 100%</p>
+    <div class="note tip"><b>🧩 Pattern มาตรฐานของ 1 โมดูล (จำให้ขึ้นใจ)</b>
+      <ol style="margin-bottom:0">
+        <li>Migration + Model + Factory (ทำใน Phase 1 แล้ว)</li>
+        <li>Controller (resource: index/create/store/edit/update/destroy)</li>
+        <li>FormRequest (กฎ validation แยกจาก controller)</li>
+        <li>Service (ถ้ามี logic ซับซ้อน เช่น คำนวณวันลา/เงินเดือน)</li>
+        <li>Blade: index (ตาราง+ค้นหา+แบ่งหน้า), create, edit</li>
+        <li>ผูก route + permission middleware</li>
+        <li>บันทึก Audit Log เมื่อ create/update/delete</li>
+      </ol>
+    </div>
+
+    <h3>5.1 ตัวอย่างเต็ม: โมดูล “พนักงาน” (Employees)</h3>
+    <h4>(ก) Controller — กำหนดสิทธิ์ผ่าน <code>HasMiddleware</code></h4>
+    <pre><span class="lang">php — EmployeeController.php</span><code>class EmployeeController extends Controller implements HasMiddleware
+{
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:employees.view',   only: ['index','show']),
+            new Middleware('permission:employees.create', only: ['create','store']),
+            new Middleware('permission:employees.update', only: ['edit','update']),
+            new Middleware('permission:employees.delete', only: ['destroy']),
+        ];
+    }
+
+    public function index(Request $request): View
+    {
+        $employees = Employee::query()
+            -&gt;with(['department','position'])
+            -&gt;when($request-&gt;q, fn ($query, $q) =&gt;
+                $query-&gt;where(fn ($w) =&gt;
+                    $w-&gt;where('first_name','like',"%$q%")
+                      -&gt;orWhere('last_name','like',"%$q%")
+                      -&gt;orWhere('employee_code','like',"%$q%")))
+            -&gt;when($request-&gt;department, fn ($query, $d) =&gt; $query-&gt;where('department_id', $d))
+            -&gt;latest()
+            -&gt;paginate(config('hrpro.per_page'))
+            -&gt;withQueryString();      // คงค่าค้นหาไว้ตอนเปลี่ยนหน้า
+
+        return view('employees.index', compact('employees'));
+    }
+
+    public function store(StoreEmployeeRequest $request, AuditLogger $audit): RedirectResponse
+    {
+        $employee = Employee::create($request-&gt;validated());
+        $audit-&gt;log('created', "เพิ่มพนักงาน: {$employee-&gt;full_name}");
+        return redirect()-&gt;route('employees.index')-&gt;with('success', 'เพิ่มพนักงานเรียบร้อย');
+    }
+    // ... edit / update / destroy รูปแบบเดียวกัน
+}</code></pre>
+    <h4>(ข) FormRequest — แยกกฎตรวจสอบ</h4>
+    <pre><span class="lang">php — StoreEmployeeRequest.php</span><code>public function rules(): array
+{
+    return [
+        'first_name' =&gt; ['required','string','max:100'],
+        'last_name' =&gt; ['required','string','max:100'],
+        'email' =&gt; ['required','email','unique:employees,email'],
+        'department_id' =&gt; ['nullable','exists:departments,id'],
+        'base_salary' =&gt; ['nullable','numeric','min:0'],
+    ];
+}</code></pre>
+    <h4>(ค) View index — ใช้ component ที่สร้างไว้</h4>
+    <pre><span class="lang">blade — employees/index.blade.php</span><code>@extends('layouts.app')
+@section('title','พนักงาน')
+@section('content')
+    &lt;x-page-header title="พนักงาน"&gt;
+        @can('employees.create')
+            &lt;x-button onclick="location='{{ route('employees.create') }}'"&gt;+ เพิ่มพนักงาน&lt;/x-button&gt;
+        @endcan
+    &lt;/x-page-header&gt;
+
+    &lt;form method="GET" class="filters"&gt;
+        &lt;x-input name="q" placeholder="ค้นหา ชื่อ/รหัส/อีเมล" value="{{ request('q') }}" /&gt;
+    &lt;/form&gt;
+
+    &lt;x-card&gt;
+        &lt;table class="table"&gt;
+            &lt;thead&gt;&lt;tr&gt;&lt;th&gt;รหัส&lt;/th&gt;&lt;th&gt;ชื่อ&lt;/th&gt;&lt;th&gt;แผนก&lt;/th&gt;&lt;th&gt;สถานะ&lt;/th&gt;&lt;th&gt;&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+            &lt;tbody&gt;
+            @forelse ($employees as $emp)
+                &lt;tr&gt;
+                    &lt;td&gt;{{ $emp-&gt;employee_code }}&lt;/td&gt;
+                    &lt;td&gt;{{ $emp-&gt;full_name }}&lt;/td&gt;
+                    &lt;td&gt;{{ $emp-&gt;department?-&gt;name ?? '–' }}&lt;/td&gt;
+                    &lt;td&gt;&lt;x-status-badge :status="$emp-&gt;status" /&gt;&lt;/td&gt;
+                    &lt;td&gt;@can('employees.update')&lt;a href="{{ route('employees.edit',$emp) }}"&gt;แก้ไข&lt;/a&gt;@endcan&lt;/td&gt;
+                &lt;/tr&gt;
+            @empty
+                &lt;tr&gt;&lt;td colspan="5"&gt;&lt;x-empty&gt;ยังไม่มีข้อมูลพนักงาน&lt;/x-empty&gt;&lt;/td&gt;&lt;/tr&gt;
+            @endforelse
+            &lt;/tbody&gt;
+        &lt;/table&gt;
+        {{ $employees-&gt;links() }}   {{-- แบ่งหน้าอัตโนมัติ --}}
+    &lt;/x-card&gt;
+@endsection</code></pre>
+    <h4>(ง) Route</h4>
+    <pre><span class="lang">php — routes/web.php (ในกลุ่ม middleware ['auth','active'])</span><code>Route::resource('employees', EmployeeController::class);</code></pre>
+
+    <h3>5.2 รายการโมดูลหลัก MVP ทั้งหมด</h3>
+    <table>
+      <tr><th>โมดูล</th><th>สิทธิ์หลัก</th><th>Service / logic พิเศษ</th></tr>
+      <tr><td>พนักงาน (Employees)</td><td><code>employees.*</code></td><td>–</td></tr>
+      <tr><td>แผนก (Departments)</td><td><code>departments.*</code></td><td>หัวหน้าแผนก (manager_id)</td></tr>
+      <tr><td>ตำแหน่ง (Positions)</td><td><code>positions.*</code></td><td>ระดับ (level)</td></tr>
+      <tr><td>ประเภทการลา (Leave Types)</td><td><code>leave-types.*</code></td><td>โควต้าวัน/ปี</td></tr>
+      <tr><td>การลาของฉัน (My Leave)</td><td>พนักงานทุกคน</td><td><b>LeaveService</b> — คำนวณวันลา หักโควต้า กันวันชนกัน</td></tr>
+      <tr><td>อนุมัติการลา (Approvals)</td><td><code>leave-approvals.approve</code></td><td>คืนโควต้าเมื่อปฏิเสธ/ยกเลิก</td></tr>
+      <tr><td>ลงเวลา (Attendance)</td><td><code>attendance.viewAll</code></td><td><b>AttendanceService</b> — clock in/out, ตัดสินมาสาย</td></tr>
+      <tr><td>ประกาศ (Announcements)</td><td><code>announcements.manage</code></td><td>ปักหมุด (pinned)</td></tr>
+      <tr><td>แดชบอร์ด (Dashboard)</td><td>ทุกคน</td><td><b>DashboardService</b> — รวมตัวเลขสรุป</td></tr>
+      <tr><td>รายงาน (Reports)</td><td><code>reports.view</code></td><td>สถิติรวม</td></tr>
+      <tr><td>ผู้ใช้ระบบ (Users)</td><td><code>users.*</code></td><td>ผูกบทบาท</td></tr>
+      <tr><td>บทบาท &amp; สิทธิ์ (Roles)</td><td><code>roles.*</code></td><td>หน้าติ๊กสิทธิ์</td></tr>
+      <tr><td>บันทึกการใช้งาน (Audit Log)</td><td><code>audit-logs.view</code></td><td>อ่านอย่างเดียว</td></tr>
+      <tr><td>การแจ้งเตือน (Notifications)</td><td>ทุกคน</td><td><b>NotificationService</b></td></tr>
+      <tr><td>โปรไฟล์ (Profile)</td><td>ทุกคน</td><td>แก้ข้อมูล/เปลี่ยนรหัส</td></tr>
+    </table>
+    <div class="card"><p><b>Service ทั้งหมด:</b> AttendanceService, LeaveService, PayrollService, DashboardService, OrgChartService, NotificationService, AuditLogger</p></div>
+
+    <!-- P6 -->
+    <h2 id="p6"><span class="num">6</span>Phase 6 — โมดูลต่อยอด (Phase 2)</h2>
+    <p>ทำหลัง MVP เสร็จ ใช้ pattern เดิมเป๊ะ แค่ logic ซับซ้อนขึ้น:</p>
+    <table>
+      <tr><th>โมดูล</th><th>ไฮไลต์ที่ต้องทำ</th></tr>
+      <tr><td><b>เงินเดือน (Payroll)</b></td><td><code>PayrollService::generateForPeriod($year,$month)</code> — คำนวณเงินเดือนทุกคนในงวด, รายการหัก/เพิ่ม</td></tr>
+      <tr><td><b>สรรหา (Recruitment)</b></td><td>JobPosting + Candidate (stage: applied→screening→interview→offer)</td></tr>
+      <tr><td><b>ประเมินผล (Performance)</b></td><td>รอบประเมิน, คะแนน, จุดแข็ง/จุดพัฒนา</td></tr>
+      <tr><td><b>ฝึกอบรม (Training)</b></td><td>TrainingCourse + TrainingEnrollment (ลงทะเบียน/สำเร็จ)</td></tr>
+      <tr><td><b>คลังเอกสาร (Documents)</b></td><td>อัปโหลดไฟล์ลง storage + สิทธิ์เข้าถึง</td></tr>
+      <tr><td><b>ผังองค์กร (Org Chart)</b></td><td>OrgChartService สร้างต้นไม้จาก department/manager</td></tr>
+      <tr><td><b>เริ่มงาน (Onboarding)</b></td><td>เช็กลิสต์งานต้อนรับ (OnboardingTask::TEMPLATE)</td></tr>
+      <tr><td><b>ส่งออก Excel/PDF</b></td><td>ExportController</td></tr>
+      <tr><td><b>แจ้งเตือน Email/LINE</b></td><td>Laravel Notification/Mail</td></tr>
+      <tr><td><b>สลับภาษา (i18n)</b></td><td>SetLocale middleware + LocaleController + ไฟล์แปลใน <code>lang/</code></td></tr>
+    </table>
+    <pre><span class="lang">php — SetLocale.php</span><code>public function handle(Request $request, Closure $next): Response
+{
+    app()-&gt;setLocale(session('locale', config('hrpro.default_locale')));
+    return $next($request);
+}</code></pre>
+
+    <!-- P7 -->
+    <h2 id="p7"><span class="num">7</span>Phase 7 — ข้อมูลเริ่มต้น &amp; Seeder</h2>
+    <p><b>เป้าหมาย:</b> ติดตั้งใหม่แล้วใช้งานได้ทันที + มีโหมดข้อมูลตัวอย่าง (เปิด/ปิดได้)</p>
+    <pre><span class="lang">php — DatabaseSeeder.php</span><code>public function run(): void
+{
+    // มีเสมอ: บทบาท/สิทธิ์ + admin 1 บัญชี (ไม่งั้น login ไม่ได้)
+    $this-&gt;call([RolePermissionSeeder::class, AdminUserSeeder::class]);
+
+    // ข้อมูลตัวอย่างเป็น "ทางเลือก" — เปิดด้วย env SEED_DEMO=true เท่านั้น
+    if (filter_var(env('SEED_DEMO', false), FILTER_VALIDATE_BOOLEAN)) {
+        $this-&gt;call(DemoDataSeeder::class);
+    }
+}</code></pre>
+    <ul>
+      <li><b>RolePermissionSeeder</b> — สร้างสิทธิ์/บทบาททั้งหมด (โครงสร้าง จำเป็นเสมอ)</li>
+      <li><b>AdminUserSeeder</b> — admin 1 บัญชีแบบ idempotent (<code>firstOrCreate</code>) ปรับผ่าน <code>ADMIN_EMAIL</code>/<code>ADMIN_PASSWORD</code></li>
+      <li><b>DemoDataSeeder</b> — ข้อมูลปลอมทั้งหมด สร้างด้วย <b>Faker</b> ตอนรัน (ไม่เก็บในไฟล์)</li>
+    </ul>
+    <pre><span class="lang">bash</span><code>php artisan migrate --seed                  # ติดตั้งสะอาด (roles + admin)
+SEED_DEMO=true php artisan migrate --seed   # พร้อมข้อมูลตัวอย่าง</code></pre>
+
+    <!-- P8 -->
+    <h2 id="p8"><span class="num">8</span>Phase 8 — การทดสอบ</h2>
+    <p>ใช้ <b>PHPUnit</b> กับ SQLite in-memory (เร็ว ไม่กระทบ DB จริง) ตั้งใน <code>phpunit.xml</code>:</p>
+    <pre><span class="lang">xml</span><code>&lt;env name="DB_CONNECTION" value="sqlite"/&gt;
+&lt;env name="DB_DATABASE" value=":memory:"/&gt;</code></pre>
+    <pre><span class="lang">php — ตัวอย่างเทสต์ feature</span><code>public function test_hr_can_create_employee(): void
+{
+    $this-&gt;seed(RolePermissionSeeder::class);
+    $hr = User::factory()-&gt;create();
+    $hr-&gt;roles()-&gt;attach(Role::where('slug','hr-manager')-&gt;first());
+
+    $this-&gt;actingAs($hr)
+        -&gt;post(route('employees.store'), [
+            'first_name' =&gt; 'สมชาย', 'last_name' =&gt; 'ใจดี',
+            'email' =&gt; 'somchai@test.local',
+        ])
+        -&gt;assertRedirect();
+
+    $this-&gt;assertDatabaseHas('employees', ['email' =&gt; 'somchai@test.local']);
+}</code></pre>
+    <pre><span class="lang">bash</span><code>php artisan test
+./vendor/bin/pint        # จัดรูปแบบโค้ดตามมาตรฐาน Laravel</code></pre>
+
+    <!-- P9 -->
+    <h2 id="p9"><span class="num">9</span>Phase 9 — นำขึ้นใช้งานจริง (Deploy)</h2>
+    <p>Deploy เป็น <b>Docker container เดียว</b> ใช้ได้ทั้ง Render/Koyeb/Fly/Railway</p>
+    <pre><span class="lang">sh — docker/entrypoint.sh (แนวคิด)</span><code>[ -f .env ] || cp .env.example .env
+[ -z "$APP_KEY" ] &amp;&amp; php artisan key:generate --force
+[ -f database/database.sqlite ] || touch database/database.sqlite
+
+php artisan migrate --force
+# seed ครั้งเดียวต่อ container; เปิดข้อมูลตัวอย่างด้วย SEED_DEMO=true
+[ -f storage/.seeded ] || { php artisan db:seed --force &amp;&amp; touch storage/.seeded; }
+
+php artisan config:cache &amp;&amp; php artisan route:cache &amp;&amp; php artisan view:cache
+exec php artisan serve --host=0.0.0.0 --port="${PORT:-8080}"</code></pre>
+    <div class="note warn"><b>⚠️ Free tier มี filesystem ชั่วคราว</b>ข้อมูลถูก seed ใหม่ทุก redeploy เหมาะกับ “เดโม” ไม่ใช่ข้อมูลจริง — ถ้าต้องการถาวรให้ใช้ MySQL ภายนอกหรือ persistent disk</div>
+
+    <!-- PROMPTS -->
+    <h2 id="prompts"><span class="num">★</span>ชุดพรอมต์สำเร็จรูป</h2>
+    <p>ถ้าอยากให้ AI (เช่น Claude Code) สร้างให้ ป้อนพรอมต์ทีละ Phase ตามนี้ (สั่งทีละขั้น อย่ารวบ):</p>
+
+    <h4>Prompt 0 — ตั้งโครง</h4>
+    <pre><code>สร้างโปรเจกต์ Laravel 12 ชื่อ hr-pro สำหรับระบบ HRIS
+ใช้ Blade ล้วน (ไม่มี Node build), CSS เขียนเองใน public/css/app.css,
+ฐานข้อมูลเริ่มด้วย SQLite. สร้าง config/hrpro.php เก็บค่า per_page,
+work_start, work_end, late_grace_minutes, company_name, default_locale.
+อธิบายทุกขั้นและให้คำสั่งที่ต้องรัน.</code></pre>
+    <h4>Prompt 1 — ฐานข้อมูล</h4>
+    <pre><code>ออกแบบ migration + Eloquent model + factory สำหรับ HRIS โดยเรียงลำดับ
+foreign key ให้ถูก: users, roles, permissions, permission_role, role_user,
+departments, positions, employees, leave_types, leave_requests,
+leave_balances, attendances, announcements, audit_logs, notifications.
+employees ใช้ softDeletes. ใส่ relationship และ casts ให้ครบ.</code></pre>
+    <h4>Prompt 2 — Auth + RBAC</h4>
+    <pre><code>ทำระบบ login เอง (AuthenticatedSessionController) ไม่ใช้ scaffold,
+และ RBAC เขียนเอง (ไม่ใช้ Spatie): ตาราง roles/permissions/permission_role/
+role_user, เมธอด User::hasPermission(), ผูก Gate::before, middleware
+'permission' และ 'active'. สร้าง RolePermissionSeeder ที่มีบทบาท
+super-admin, hr-manager, manager, employee พร้อมสิทธิ์รูปแบบ
+'&lt;resource&gt;.&lt;action&gt;'.</code></pre>
+    <h4>Prompt 3 — Design System</h4>
+    <pre><code>สร้าง layout app.blade.php (sidebar + topbar + content), public/css/app.css
+ที่มี CSS variables (--color-primary: #2563eb ฯลฯ), ฟอนต์ Inter + Noto Sans Thai,
+และ Blade components: alert, badge, button, card, checkbox, empty, icon, input,
+nav-link, page-header, select, stat, status-badge, textarea. เพิ่ม helper
+initials(), thb(), avatar_color() ใน app/Support/helpers.php.</code></pre>
+    <h4>Prompt 4 — โมดูล (ทำซ้ำต่อโมดูล)</h4>
+    <pre><code>สร้างโมดูล "&lt;ชื่อโมดูล&gt;" ตาม pattern มาตรฐาน: resource controller ที่ใช้
+HasMiddleware ผูกสิทธิ์ &lt;resource&gt;.view/create/update/delete, FormRequest
+แยก validation, (ถ้ามี logic ซับซ้อนให้แยกเป็น Service), Blade index
+(ค้นหา+กรอง+แบ่งหน้าด้วย config('hrpro.per_page'))/create/edit ที่ใช้
+component เดิม, route resource, และบันทึก Audit Log เมื่อ create/update/delete.
+ทำโมดูล Employees ก่อนเป็นต้นแบบ.</code></pre>
+    <h4>Prompt 5 — Seeder แบบ opt-in</h4>
+    <pre><code>ปรับ DatabaseSeeder ให้ seed RolePermissionSeeder + AdminUserSeeder เสมอ
+(admin แบบ idempotent ปรับผ่าน ADMIN_EMAIL/ADMIN_PASSWORD) และเรียก
+DemoDataSeeder เฉพาะเมื่อ env SEED_DEMO=true. DemoDataSeeder ใช้ Faker
+สร้างพนักงาน ~47 คน + การลา/ลงเวลา/ประกาศ/เงินเดือน.</code></pre>
+    <h4>Prompt 6 — Deploy</h4>
+    <pre><code>ทำ Dockerfile + docker/entrypoint.sh ที่ migrate, seed ครั้งเดียว (ตาม
+SEED_DEMO), cache config/route/view แล้ว serve ที่ $PORT, พร้อม render.yaml
+(Blueprint, autoDeploy, env APP_KEY/APP_URL/SEED_DEMO).</code></pre>
+
+    <!-- CHECKLIST -->
+    <h2 id="checklist"><span class="num">✓</span>สรุปลำดับการสร้าง (Checklist)</h2>
+    <div class="card">
+      <ul class="checklist">
+        <li>Phase 0 — โครงโปรเจกต์ + .env + config/hrpro.php</li>
+        <li>Phase 1 — migration + model + factory (เรียง FK ถูก)</li>
+        <li>Phase 2 — login เอง + middleware active</li>
+        <li>Phase 3 — RBAC + RolePermissionSeeder</li>
+        <li>Phase 4 — layout + CSS tokens + Blade components + helpers</li>
+        <li>Phase 5 — โมดูล MVP ทีละตัว (เริ่มที่ Employees)</li>
+        <li>Phase 6 — โมดูล Phase 2 (Payroll, Recruitment, …)</li>
+        <li>Phase 7 — Seeder opt-in (admin + demo)</li>
+        <li>Phase 8 — เขียนเทสต์ + pint</li>
+        <li>Phase 9 — Docker + Render</li>
+      </ul>
+    </div>
+    <div class="note ok"><b>เคล็ดลับสุดท้าย</b>อย่าทำทุกโมดูลพร้อมกัน — ทำ Employees ให้ครบวงจร (DB→Controller→View→Test) ก่อน 1 ตัว แล้วค่อยก็อปแพตเทิร์นไปโมดูลอื่น จะเร็วและพลาดน้อยที่สุด</div>
+
+    <div class="footer">
+      HR PRO — คู่มือสร้างระบบ ฉบับละเอียด · สร้างด้วย Laravel 12 + Blade<br>
+      เอกสารนี้สรุปจากโครงสร้างจริงของโปรเจกต์
+    </div>
+  </main>
+</div>
+</body>
+</html>

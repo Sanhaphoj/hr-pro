@@ -16,8 +16,8 @@ class PayrollController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:payroll.view', only: ['index', 'show']),
-            new Middleware('permission:payroll.manage', only: ['generate', 'finalize']),
+            new Middleware('permission:payroll.view', only: ['index', 'show', 'printSlip', 'printRegister']),
+            new Middleware('permission:payroll.manage', only: ['generate', 'update', 'finalize']),
         ];
     }
 
@@ -36,7 +36,8 @@ class PayrollController extends Controller implements HasMiddleware
             ->withQueryString();
 
         $totals = Payroll::forPeriod($year, $month)
-            ->selectRaw('COUNT(*) as cnt, COALESCE(SUM(net_pay),0) as net, COALESCE(SUM(deductions),0) as ded')
+            ->selectRaw('COUNT(*) as cnt, COALESCE(SUM(net_pay),0) as net, COALESCE(SUM(deductions),0) as ded,
+                COALESCE(SUM(withholding_tax),0) as tax, COALESCE(SUM(social_security),0) as sso')
             ->first();
 
         return view('payroll.index', [
@@ -68,6 +69,86 @@ class PayrollController extends Controller implements HasMiddleware
         $payroll->load('employee.department', 'employee.position');
 
         return view('payroll.show', ['payroll' => $payroll]);
+    }
+
+    /**
+     * The payslip as an A4 document, with the employee's year-to-date totals.
+     */
+    public function printSlip(Payroll $payroll): View
+    {
+        $payroll->load('employee.department', 'employee.position');
+
+        AuditLogger::log('printed', "พิมพ์สลิปเงินเดือน #{$payroll->id}", $payroll);
+
+        return view('print.payslip', [
+            'payroll' => $payroll,
+            'ytd' => $payroll->yearToDate(),
+            'back' => route('payroll.show', $payroll),
+        ]);
+    }
+
+    /**
+     * Every payslip of one period on a single register, with totals.
+     */
+    public function printRegister(Request $request): View
+    {
+        $data = $request->validate([
+            'year' => ['nullable', 'integer', 'min:2000', 'max:2100'],
+            'month' => ['nullable', 'integer', 'min:1', 'max:12'],
+        ]);
+
+        $year = (int) ($data['year'] ?? now()->year);
+        $month = (int) ($data['month'] ?? now()->month);
+
+        $payrolls = Payroll::query()
+            ->forPeriod($year, $month)
+            ->with('employee.department', 'employee.position')
+            ->join('employees', 'employees.id', '=', 'payrolls.employee_id')
+            ->orderBy('employees.first_name')
+            ->orderBy('employees.last_name')
+            ->select('payrolls.*')
+            ->get();
+
+        AuditLogger::log('printed', "พิมพ์รายงานเงินเดือนงวด {$month}/{$year}");
+
+        return view('print.payroll-register', [
+            'payrolls' => $payrolls,
+            'year' => $year,
+            'month' => $month,
+            'totals' => [
+                'base' => (float) $payrolls->sum('base_salary'),
+                'overtime' => (float) $payrolls->sum('overtime_pay'),
+                'allowances' => (float) $payrolls->sum('allowances'),
+                'tax' => (float) $payrolls->sum('withholding_tax'),
+                'sso' => (float) $payrolls->sum('social_security'),
+                'deductions' => (float) $payrolls->sum('deductions'),
+                'net' => (float) $payrolls->sum('net_pay'),
+                'finalized' => $payrolls->where('status', 'finalized')->count(),
+            ],
+        ]);
+    }
+
+    /**
+     * Overtime hours and allowances on a draft slip; every amount that
+     * depends on them (SSO, tax, net) is worked out again.
+     */
+    public function update(Request $request, Payroll $payroll, PayrollService $service): RedirectResponse
+    {
+        abort_if($payroll->isFinalized(), 403, 'สลิปที่ยืนยันแล้วแก้ไขไม่ได้');
+
+        $data = $request->validate([
+            'overtime_hours' => ['required', 'numeric', 'between:0,300'],
+            'allowances' => ['required', 'numeric', 'between:0,10000000'],
+        ], [
+            'overtime_hours.between' => 'ชั่วโมง OT ต้องอยู่ระหว่าง 0–300 ชั่วโมง',
+            'allowances.between' => 'เบี้ยเลี้ยงต้องไม่ติดลบ',
+        ]);
+
+        $service->recalculate($payroll, (float) $data['overtime_hours'], (float) $data['allowances']);
+
+        AuditLogger::log('updated', "ปรับ OT/เบี้ยเลี้ยงในสลิปเงินเดือน #{$payroll->id}", $payroll);
+
+        return back()->with('success', 'คำนวณสลิปใหม่เรียบร้อยแล้ว — สุทธิ '.thb($payroll->net_pay));
     }
 
     public function finalize(Payroll $payroll): RedirectResponse

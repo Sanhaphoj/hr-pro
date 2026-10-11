@@ -26,14 +26,14 @@
             <x-empty icon="users" title="ไม่พบผู้ใช้งาน" message="ยังไม่มีบัญชีผู้ใช้งานที่ตรงกับเงื่อนไข" />
         @else
             <div class="table-wrap">
-                <table class="table">
+                <table class="table table--cards">
                     <thead>
                         <tr>
                             <th>ผู้ใช้งาน</th>
                             <th>บทบาท</th>
                             <th>สถานะ</th>
                             <th>เข้าสู่ระบบล่าสุด</th>
-                            <th style="text-align:right;">การจัดการ</th>
+                            <th class="actions">การจัดการ</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -48,17 +48,17 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>
+                                <td data-label="บทบาท">
                                     @forelse($user->roles as $role)
                                         <x-badge color="blue">{{ $role->name }}</x-badge>
                                     @empty
                                         <span class="cell-sub">—</span>
                                     @endforelse
                                 </td>
-                                <td><x-status-badge type="active" :value="$user->is_active" /></td>
-                                <td class="cell-sub">{{ $user->last_login_at?->diffForHumans() ?? '—' }}</td>
-                                <td style="text-align:right;">
-                                    <div class="flex items-center gap-2" style="justify-content:flex-end;">
+                                <td data-label="สถานะ"><x-status-badge type="active" :value="$user->is_active" /></td>
+                                <td class="cell-sub" data-label="เข้าสู่ระบบล่าสุด">{{ $user->last_login_at?->diffForHumans() ?? '—' }}</td>
+                                <td class="actions">
+                                    <div class="flex items-center gap-2 justify-end">
                                         @can('users.view')
                                             <x-button :href="route('settings.users.show', $user)" variant="ghost" size="sm" icon="eye">ดู</x-button>
                                         @endcan
@@ -81,7 +81,7 @@
                     </tbody>
                 </table>
             </div>
-            <div style="padding:14px 20px;">{{ $users->links() }}</div>
+            <div class="card__pager">{{ $users->links() }}</div>
         @endif
     </x-card>
 @endsection

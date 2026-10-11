@@ -28,7 +28,7 @@
                 <ul>
                     <li>
                         <div class="org-node org-node--root">
-                            <span class="org-node__logo">HR</span>
+                            @include('partials.brand-mark', ['base' => 'org-node__logo'])
                             <div class="org-node__name">{{ $company }}</div>
                             <div class="org-node__meta">{{ number_format($department_count) }} แผนก · {{ number_format($employee_count) }} พนักงาน</div>
                         </div>

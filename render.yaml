@@ -11,7 +11,7 @@ services:
     autoDeploy: true
     envVars:
       - key: APP_NAME
-        value: "HR PRO"
+        value: "HR PRO V.2"
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
@@ -31,6 +31,17 @@ services:
       # install (roles/permissions + one admin account only). Set this to
       # "true" in the Render dashboard to populate the public live demo.
       - key: SEED_DEMO
+        sync: false
+      # Real (non-demo) install: the admin's first password. Leave unset and a
+      # random one-time password is printed in the deploy logs instead; either
+      # way it must be changed at first sign-in. Set ADMIN_EMAIL to a real address.
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      # "ผู้ช่วย HR" (Claude). Leave unset to hide the assistant; every
+      # question is a paid API call.
+      - key: ANTHROPIC_API_KEY
         sync: false
       - key: DB_CONNECTION
         value: sqlite

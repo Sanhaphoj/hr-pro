@@ -10,6 +10,7 @@
     <x-page-header title="รายละเอียดคำขอลา" subtitle="คำขอของ {{ $leaveRequest->employee?->full_name ?? '—' }}">
         <x-slot:actions>
             <x-button :href="route('leave-requests.index')" variant="ghost" icon="arrow-left">กลับ</x-button>
+            <x-button :href="route('leave-requests.print', $leaveRequest)" variant="secondary" icon="printer">พิมพ์ใบลา</x-button>
             @if($cancellable && $isOwner)
                 <form method="POST" action="{{ route('leave-requests.cancel', $leaveRequest) }}"
                       data-confirm="ยืนยันการยกเลิกคำขอลานี้?">
@@ -32,20 +33,20 @@
                 <dt>สถานะ</dt><dd><x-status-badge type="leave" :value="$leaveRequest->status" /></dd>
             </dl>
 
-            <div style="margin-top:16px;">
+            <div class="section-gap">
                 <div class="cell-sub" style="margin-bottom:4px;">เหตุผลการลา</div>
                 <div>{{ $leaveRequest->reason ?: '—' }}</div>
             </div>
 
             @if($leaveRequest->rejection_reason)
-                <div style="margin-top:16px;">
+                <div class="section-gap">
                     <div class="cell-sub" style="margin-bottom:4px;">เหตุผลที่ไม่อนุมัติ</div>
                     <div>{{ $leaveRequest->rejection_reason }}</div>
                 </div>
             @endif
 
             @if($leaveRequest->attachment_path)
-                <div style="margin-top:16px;">
+                <div class="section-gap">
                     <a href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($leaveRequest->attachment_path) }}"
                        target="_blank" rel="noopener" class="btn btn--ghost btn--sm">
                         <x-icon name="download" width="16" height="16" />ดูเอกสารแนบ

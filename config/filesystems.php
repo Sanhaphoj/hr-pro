@@ -31,6 +31,16 @@ return [
             'throw' => false,
         ],
 
+        // Logos uploaded on the settings screen. Served straight from public/
+        // so they show without `php artisan storage:link`.
+        'branding' => [
+            'driver' => 'local',
+            'root' => public_path('uploads/branding'),
+            'url' => env('APP_URL').'/uploads/branding',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

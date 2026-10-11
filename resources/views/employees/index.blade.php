@@ -3,11 +3,12 @@
 
 @section('content')
     <x-page-header title="พนักงาน" subtitle="ทำเนียบและข้อมูลพนักงานทั้งหมดในองค์กร">
-        @can('employees.create')
-            <x-slot:actions>
+        <x-slot:actions>
+            <x-button :href="route('employees.print-list', array_filter($filters))" variant="secondary" icon="printer">พิมพ์รายชื่อ</x-button>
+            @can('employees.create')
                 <x-button href="{{ route('employees.create') }}" icon="plus">เพิ่มพนักงาน</x-button>
-            </x-slot:actions>
-        @endcan
+            @endcan
+        </x-slot:actions>
     </x-page-header>
 
     <x-card :padding="false">
@@ -32,10 +33,14 @@
         </form>
 
         @if($employees->isEmpty())
-            <x-empty icon="users" title="ไม่พบพนักงาน" message="ลองปรับเงื่อนไขการค้นหา หรือเพิ่มพนักงานใหม่" />
+            <x-empty icon="users" title="ไม่พบพนักงาน" message="ลองล้างตัวกรอง หรือเริ่มต้นด้วยการเพิ่มพนักงานคนแรก">
+                @can('employees.create')
+                    <x-button href="{{ route('employees.create') }}" icon="plus">เพิ่มพนักงาน</x-button>
+                @endcan
+            </x-empty>
         @else
             <div class="table-wrap">
-                <table class="table">
+                <table class="table table--cards">
                     <thead>
                         <tr>
                             <th>พนักงาน</th>
@@ -43,7 +48,7 @@
                             <th>แผนก</th>
                             <th>ตำแหน่ง</th>
                             <th>สถานะ</th>
-                            <th style="text-align:right;">จัดการ</th>
+                            <th class="actions">จัดการ</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -58,12 +63,12 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>{{ $employee->employee_code }}</td>
-                                <td>{{ $employee->department?->name ?? '—' }}</td>
-                                <td>{{ $employee->position?->title ?? '—' }}</td>
-                                <td><x-status-badge type="employee" :value="$employee->status" /></td>
-                                <td>
-                                    <div class="flex items-center gap-1" style="justify-content:flex-end;">
+                                <td data-label="รหัสพนักงาน">{{ $employee->employee_code }}</td>
+                                <td data-label="แผนก">{{ $employee->department?->name ?? '—' }}</td>
+                                <td data-label="ตำแหน่ง">{{ $employee->position?->title ?? '—' }}</td>
+                                <td data-label="สถานะ"><x-status-badge type="employee" :value="$employee->status" /></td>
+                                <td class="actions">
+                                    <div class="flex items-center gap-1 justify-end">
                                         <a href="{{ route('employees.show', $employee) }}" class="btn btn--ghost btn--sm" title="ดู"><x-icon name="eye" width="16" height="16" /></a>
                                         @can('employees.update')
                                             <a href="{{ route('employees.edit', $employee) }}" class="btn btn--ghost btn--sm" title="แก้ไข"><x-icon name="edit" width="16" height="16" /></a>
@@ -82,7 +87,7 @@
                     </tbody>
                 </table>
             </div>
-            <div style="padding:0 20px 12px;">{{ $employees->links() }}</div>
+            <div class="card__pager">{{ $employees->links() }}</div>
         @endif
     </x-card>
 @endsection

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Support\PasswordPolicy;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -20,7 +21,7 @@ class UpdateUserRequest extends FormRequest
                 'required', 'string', 'email', 'max:160',
                 Rule::unique('users', 'email')->ignore(optional($this->route('user'))->id),
             ],
-            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'password' => ['nullable', 'string', 'confirmed', PasswordPolicy::rule()],
             'roles' => ['nullable', 'array'],
             'roles.*' => ['exists:roles,id'],
             'is_active' => ['boolean'],
@@ -29,13 +30,12 @@ class UpdateUserRequest extends FormRequest
 
     public function messages(): array
     {
-        return [
+        return PasswordPolicy::messages() + [
             'name.required' => 'กรุณากรอกชื่อ',
             'name.max' => 'ชื่อต้องไม่เกิน 120 ตัวอักษร',
             'email.required' => 'กรุณากรอกอีเมล',
             'email.email' => 'รูปแบบอีเมลไม่ถูกต้อง',
             'email.unique' => 'อีเมลนี้ถูกใช้งานแล้ว',
-            'password.min' => 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร',
             'password.confirmed' => 'การยืนยันรหัสผ่านไม่ตรงกัน',
             'roles.*.exists' => 'บทบาทที่เลือกไม่ถูกต้อง',
         ];

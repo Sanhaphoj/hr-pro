@@ -50,7 +50,7 @@
                     <p style="margin:0; color:var(--text-2);">{{ \Illuminate\Support\Str::limit(strip_tags($announcement->body), 220) }}</p>
 
                     @if($canManage)
-                        <div class="flex items-center gap-2" style="margin-top:14px;">
+                        <div class="flex items-center gap-2 field-gap">
                             <x-button href="{{ route('announcements.show', $announcement) }}" variant="ghost" size="sm" icon="eye">ดู</x-button>
                             @can('announcements.manage')
                                 <x-button href="{{ route('announcements.edit', $announcement) }}" variant="secondary" size="sm" icon="edit">แก้ไข</x-button>
@@ -66,6 +66,6 @@
             @endforeach
         </div>
 
-        <div style="margin-top:18px;">{{ $announcements->links() }}</div>
+        <div class="section-gap">{{ $announcements->links() }}</div>
     @endif
 @endsection

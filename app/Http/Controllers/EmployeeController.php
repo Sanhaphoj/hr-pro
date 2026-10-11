@@ -8,6 +8,7 @@ use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Position;
 use App\Services\AuditLogger;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -19,7 +20,7 @@ class EmployeeController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:employees.view', only: ['index', 'show']),
+            new Middleware('permission:employees.view', only: ['index', 'show', 'print', 'printList', 'certificate']),
             new Middleware('permission:employees.create', only: ['create', 'store']),
             new Middleware('permission:employees.update', only: ['edit', 'update']),
             new Middleware('permission:employees.delete', only: ['destroy']),
@@ -28,17 +29,7 @@ class EmployeeController extends Controller implements HasMiddleware
 
     public function index(Request $request): View
     {
-        $employees = Employee::query()
-            ->with(['department', 'position'])
-            ->search($request->query('q'))
-            ->when($request->filled('department_id'), function ($query) use ($request) {
-                $query->where('department_id', $request->query('department_id'));
-            })
-            ->when($request->filled('status'), function ($query) use ($request) {
-                $query->where('status', $request->query('status'));
-            })
-            ->orderBy('first_name')
-            ->orderBy('last_name')
+        $employees = $this->filteredQuery($request)
             ->paginate(config('hrpro.per_page'))
             ->withQueryString();
 
@@ -100,6 +91,80 @@ class EmployeeController extends Controller implements HasMiddleware
         ]);
     }
 
+    /**
+     * The employee record as a confidential A4 document.
+     */
+    public function print(Employee $employee): View
+    {
+        $employee->load(['department', 'position', 'manager']);
+        $year = (int) now()->year;
+
+        AuditLogger::log('printed', "พิมพ์ทะเบียนประวัติ {$employee->full_name}", $employee);
+
+        return view('print.employee', [
+            'employee' => $employee,
+            'balances' => $employee->leaveBalances()->with('leaveType')->where('year', $year)->get(),
+            'leaveRequests' => $employee->leaveRequests()->with('leaveType')->orderByDesc('start_date')->limit(10)->get(),
+            'trainings' => $employee->trainingEnrollments()->with('course')->latest()->limit(10)->get(),
+            'reviews' => $employee->performanceReviews()->orderByDesc('reviewed_at')->limit(5)->get(),
+            'year' => $year,
+            'statusLabel' => $this->statusOptions()[$employee->status] ?? '—',
+            'typeLabel' => $this->employmentTypeOptions()[$employee->employment_type] ?? '—',
+        ]);
+    }
+
+    /**
+     * An employment certificate, optionally stating the salary. The number
+     * and purpose are typed in on the document's toolbar and not stored.
+     */
+    public function certificate(Request $request, Employee $employee): View
+    {
+        $data = $request->validate([
+            'salary' => ['nullable', 'boolean'],
+            'purpose' => ['nullable', 'string', 'max:150'],
+            'number' => ['nullable', 'string', 'max:40'],
+        ]);
+
+        $employee->load(['department', 'position']);
+        $withSalary = (bool) ($data['salary'] ?? false);
+
+        AuditLogger::log(
+            'printed',
+            ($withSalary ? 'ออกหนังสือรับรองการทำงานและเงินเดือน ' : 'ออกหนังสือรับรองการทำงาน ').$employee->full_name,
+            $employee,
+        );
+
+        return view('print.certificate', [
+            'employee' => $employee,
+            'withSalary' => $withSalary,
+            'purpose' => $data['purpose'] ?? null,
+            'number' => $data['number'] ?? null,
+            'typeLabel' => $this->employmentTypeOptions()[$employee->employment_type] ?? '—',
+        ]);
+    }
+
+    /**
+     * The employee register, honouring the list's search and filters.
+     */
+    public function printList(Request $request): View
+    {
+        $statuses = $this->statusOptions();
+        $department = $request->filled('department_id')
+            ? Department::whereKey($request->query('department_id'))->value('name')
+            : null;
+
+        return view('print.employees', [
+            'employees' => $this->filteredQuery($request)->get(),
+            'statuses' => $statuses,
+            'types' => $this->employmentTypeOptions(),
+            'filterSummary' => array_values(array_filter([
+                $request->filled('q') ? 'ค้นหา “'.$request->query('q').'”' : null,
+                $department ? 'แผนก '.$department : null,
+                $request->filled('status') ? 'สถานะ '.($statuses[$request->query('status')] ?? $request->query('status')) : null,
+            ])),
+        ]);
+    }
+
     public function edit(Employee $employee): View
     {
         return view('employees.edit', array_merge(
@@ -126,6 +191,24 @@ class EmployeeController extends Controller implements HasMiddleware
         AuditLogger::log('deleted', "ลบพนักงาน {$name}", $employee);
 
         return redirect()->route('employees.index')->with('success', 'ลบพนักงานเรียบร้อยแล้ว');
+    }
+
+    /**
+     * The list's search and filters, shared by the screen and its printout.
+     */
+    protected function filteredQuery(Request $request): Builder
+    {
+        return Employee::query()
+            ->with(['department', 'position'])
+            ->search($request->query('q'))
+            ->when($request->filled('department_id'), function ($query) use ($request) {
+                $query->where('department_id', $request->query('department_id'));
+            })
+            ->when($request->filled('status'), function ($query) use ($request) {
+                $query->where('status', $request->query('status'));
+            })
+            ->orderBy('first_name')
+            ->orderBy('last_name');
     }
 
     /**

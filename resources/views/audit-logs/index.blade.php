@@ -29,7 +29,7 @@
                      message="{{ $search || $action ? 'ไม่มีรายการที่ตรงกับเงื่อนไขการค้นหา' : 'เมื่อมีกิจกรรมในระบบ จะปรากฏที่นี่' }}" />
         @else
             <div class="table-wrap">
-                <table class="table">
+                <table class="table table--cards">
                     <thead>
                         <tr>
                             <th>เวลา</th>
@@ -48,6 +48,7 @@
                                     'deleted' => 'red',
                                     'approved' => 'green',
                                     'rejected' => 'red',
+                                    'printed' => 'amber',
                                     'login' => 'gray',
                                     'logout' => 'gray',
                                 ];
@@ -59,7 +60,7 @@
                                     <div class="cell-strong">{{ $log->created_at->format('d/m/Y H:i') }}</div>
                                     <div class="cell-sub">{{ $log->created_at->diffForHumans() }}</div>
                                 </td>
-                                <td>
+                                <td data-label="ผู้ใช้งาน">
                                     @if($log->user)
                                         <div class="flex items-center gap-2">
                                             <span class="avatar" style="background: {{ avatar_color($log->user->email) }}">{{ $log->user->initials }}</span>
@@ -69,15 +70,15 @@
                                         <span class="cell-sub">ระบบ</span>
                                     @endif
                                 </td>
-                                <td><x-badge :color="$actionColor" :dot="true">{{ $actionLabel }}</x-badge></td>
-                                <td>{{ $log->description }}</td>
-                                <td class="cell-sub">{{ $log->ip_address ?? '—' }}</td>
+                                <td data-label="การกระทำ"><x-badge :color="$actionColor" :dot="true">{{ $actionLabel }}</x-badge></td>
+                                <td data-label="รายละเอียด">{{ $log->description }}</td>
+                                <td class="cell-sub" data-label="IP Address">{{ $log->ip_address ?? '—' }}</td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
-            <div style="padding:0 20px 16px;">{{ $logs->links() }}</div>
+            <div class="card__pager">{{ $logs->links() }}</div>
         @endif
     </x-card>
 @endsection

@@ -17,7 +17,7 @@ class TrainingController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:training.view', only: ['index', 'show']),
+            new Middleware('permission:training.view', only: ['index', 'show', 'print']),
             new Middleware('permission:training.manage', only: ['create', 'store', 'destroy', 'enroll', 'complete']),
         ];
     }
@@ -67,6 +67,24 @@ class TrainingController extends Controller implements HasMiddleware
             'course' => $training,
             'employees' => $employees,
         ]);
+    }
+
+    /**
+     * A sign-in sheet listing everyone enrolled, with space to sign.
+     */
+    public function print(TrainingCourse $training): View
+    {
+        $training->load(['enrollments.employee.department']);
+        $training->setRelation(
+            'enrollments',
+            // Someone whose enrolment was cancelled has no line to sign.
+            $training->enrollments
+                ->reject(fn (TrainingEnrollment $e) => $e->status === 'cancelled')
+                ->sortBy(fn (TrainingEnrollment $e) => $e->employee?->full_name)
+                ->values(),
+        );
+
+        return view('print.training', ['course' => $training]);
     }
 
     public function enroll(Request $request, TrainingCourse $training): RedirectResponse

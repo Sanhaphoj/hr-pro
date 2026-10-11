@@ -35,7 +35,7 @@
                 <x-checkbox name="pinned" label="ปักหมุดไว้ด้านบน" />
             </div>
 
-            <div class="flex items-center gap-2" style="margin-top:18px;">
+            <div class="form-actions">
                 <x-button type="submit" icon="check">บันทึกประกาศ</x-button>
                 <x-button href="{{ route('announcements.index') }}" variant="ghost">ยกเลิก</x-button>
             </div>

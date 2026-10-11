@@ -15,6 +15,13 @@
         'audit-logs' => 'บันทึกการใช้งาน',
         'users' => 'ผู้ใช้งาน',
         'roles' => 'บทบาท',
+        'work-locations' => 'บริเวณลงเวลา',
+        'payroll' => 'เงินเดือน',
+        'recruitment' => 'สรรหาบุคลากร',
+        'performance' => 'ประเมินผล',
+        'training' => 'ฝึกอบรม',
+        'documents' => 'คลังเอกสาร',
+        'settings' => 'การตั้งค่าระบบ',
     ];
     $permissions = $user->roles->flatMap->permissions->unique('id')->sortBy('name');
     $grouped = $permissions->groupBy('group');
@@ -31,9 +38,9 @@
     </x-page-header>
 
     <div class="grid grid--2">
-        <div class="grid" style="align-content:start;">
+        <div class="grid content-start">
             <x-card title="ข้อมูลบัญชี">
-                <div class="flex items-center gap-2" style="margin-bottom:16px;">
+                <div class="flex items-center gap-2 mb-2">
                     <span class="avatar avatar--lg" style="background: {{ avatar_color($user->email) }}">{{ $user->initials }}</span>
                     <div>
                         <div class="cell-strong" style="font-size:16px;">{{ $user->name }}</div>
@@ -67,9 +74,9 @@
             @endif
 
             @forelse($grouped as $group => $items)
-                <div style="margin-bottom:16px;">
+                <div class="mb-2">
                     <div class="cell-strong" style="margin-bottom:8px;">{{ $groupLabels[$group] ?? $group }}</div>
-                    <div class="flex items-center gap-2" style="flex-wrap:wrap;">
+                    <div class="flex items-center gap-2 flex-wrap">
                         @foreach($items as $permission)
                             <x-badge color="gray">{{ $permission->description ?: $permission->name }}</x-badge>
                         @endforeach

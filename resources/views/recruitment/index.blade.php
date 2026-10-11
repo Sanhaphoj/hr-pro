@@ -15,7 +15,7 @@
             <x-empty icon="user" title="ยังไม่มีประกาศรับสมัคร" message="เริ่มต้นด้วยการเปิดรับสมัครตำแหน่งแรก" />
         @else
             <div class="table-wrap">
-                <table class="table">
+                <table class="table table--cards">
                     <thead>
                         <tr>
                             <th>ตำแหน่ง</th>
@@ -23,18 +23,18 @@
                             <th class="num">อัตรา</th>
                             <th class="num">ผู้สมัคร</th>
                             <th>สถานะ</th>
-                            <th style="text-align:right;">จัดการ</th>
+                            <th class="actions">จัดการ</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($postings as $posting)
                             <tr>
                                 <td class="cell-strong">{{ $posting->title }}</td>
-                                <td>{{ $posting->department?->name ?? '—' }}</td>
-                                <td class="num">{{ $posting->openings }}</td>
-                                <td class="num">{{ $posting->candidates_count }}</td>
-                                <td><x-badge :color="$posting->status === 'open' ? 'green' : 'gray'">{{ $posting->status === 'open' ? 'เปิดรับ' : 'ปิดรับ' }}</x-badge></td>
-                                <td style="text-align:right;">
+                                <td data-label="แผนก">{{ $posting->department?->name ?? '—' }}</td>
+                                <td class="num" data-label="อัตรา">{{ $posting->openings }}</td>
+                                <td class="num" data-label="ผู้สมัคร">{{ $posting->candidates_count }}</td>
+                                <td data-label="สถานะ"><x-badge :color="$posting->status === 'open' ? 'green' : 'gray'">{{ $posting->status === 'open' ? 'เปิดรับ' : 'ปิดรับ' }}</x-badge></td>
+                                <td class="actions">
                                     <x-button href="{{ route('recruitment.show', $posting) }}" variant="ghost" size="sm" icon="eye">ดู</x-button>
                                 </td>
                             </tr>
@@ -42,7 +42,7 @@
                     </tbody>
                 </table>
             </div>
-            <div style="padding:12px 20px;">{{ $postings->links() }}</div>
+            <div class="card__pager">{{ $postings->links() }}</div>
         @endif
     </x-card>
 @endsection

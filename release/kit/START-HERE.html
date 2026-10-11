@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HR PRO V.2 — คู่มือเริ่มต้นใช้งาน</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand: #0e8f88; --brand-700: #086561; --brand-soft: #e5f5f3; --ink: #0d2b33;
+    --bg: #f2f6f6; --surface: #fff; --sunk: #f7fafa; --border: #e4ecec; --border-strong: #c9d8d8;
+    --text: #12262c; --soft: #4d6068; --muted: #7d9098;
+    --warn: #80470b; --warn-bg: #fdf1e0; --warn-border: #f3ddb4;
+    --info: #1a347d; --info-bg: #e4f2fa; --info-border: #c9d8f6;
+    --ok: #0f7a43; --ok-bg: #e3f6ea;
+    --code-bg: #0d2b33; --code-text: #e6f0f1;
+    --radius: 16px; --radius-sm: 10px;
+    --shadow: 0 1px 2px rgba(13,43,51,.05), 0 8px 24px rgba(13,43,51,.06);
+    --font: 'Inter', 'Noto Sans Thai', 'Leelawadee UI', Tahoma, system-ui, sans-serif;
+    --mono: ui-monospace, 'Cascadia Mono', Consolas, 'SFMono-Regular', monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --brand: #2bb3ab; --brand-700: #7fdad4; --brand-soft: #14312f; --ink: #071316;
+      --bg: #0b1417; --surface: #121e22; --sunk: #172529; --border: #22353b; --border-strong: #334a51;
+      --text: #e6f0f1; --soft: #a8bfc4; --muted: #7d969d;
+      --warn: #fbbf24; --warn-bg: #2c2010; --warn-border: #4a3612;
+      --info: #93c5fd; --info-bg: #10233a; --info-border: #1e3a5f;
+      --ok: #4ade80; --ok-bg: #10291d;
+      --code-bg: #071316; --code-text: #e6f0f1;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15.5px/1.75 var(--font); }
+  a { color: var(--brand); }
+  img { max-width: 100%; display: block; }
+  h1, h2, h3 { line-height: 1.35; margin: 0; }
+  code, kbd { font-family: var(--mono); font-size: .88em; }
+  :not(pre) > code { background: var(--brand-soft); color: var(--brand-700); padding: 1px 6px; border-radius: 6px; }
+  kbd { border: 1px solid var(--border-strong); border-bottom-width: 2px; border-radius: 6px; padding: 0 6px; background: var(--surface); }
+
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 20px 80px; }
+
+  /* Hero */
+  .hero { background: linear-gradient(135deg, #0d2b33 0%, #0e5a5a 60%, #0e8f88 100%); color: #fff; padding: 46px 20px 92px; }
+  .hero .inner { max-width: 920px; margin: 0 auto; }
+  .brand { display: inline-flex; align-items: center; gap: 12px; font-weight: 700; font-size: 17px; }
+  .brand i { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; font-style: normal; background: linear-gradient(135deg, #22c5bb, #2dd4bf); color: #0d2b33; font-weight: 800; }
+  .hero h1 { font-size: clamp(26px, 4.4vw, 38px); margin: 26px 0 10px; }
+  .hero p { margin: 0; max-width: 640px; opacity: .86; }
+
+  /* Path chooser */
+  .paths { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: -58px; }
+  .path { display: block; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); color: inherit; text-decoration: none; transition: border-color .15s, transform .15s; }
+  .path:hover { border-color: var(--brand); transform: translateY(-2px); }
+  .path small { display: inline-block; font-size: 12px; font-weight: 600; color: var(--brand); text-transform: uppercase; letter-spacing: .04em; }
+  .path h2 { font-size: 19px; margin: 4px 0 6px; }
+  .path p { margin: 0; color: var(--soft); font-size: 14px; }
+
+  /* Sections */
+  section { margin-top: 56px; }
+  .eyebrow { font-size: 12.5px; font-weight: 700; color: var(--brand); letter-spacing: .05em; text-transform: uppercase; }
+  section > h2 { font-size: 26px; margin: 6px 0 8px; }
+  section > p.lead { color: var(--soft); margin: 0 0 22px; }
+
+  .step { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 24px 22px 76px; margin-top: 16px; box-shadow: var(--shadow); }
+  .step::before { content: attr(data-n); position: absolute; left: 22px; top: 22px; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; background: var(--brand); color: #fff; }
+  .step h3 { font-size: 18.5px; margin-bottom: 6px; }
+  .step p { margin: 8px 0; }
+  .step ol, .step ul { margin: 8px 0; padding-left: 22px; }
+  .step li { margin: 4px 0; }
+
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 0; }
+  .tabs button { font: inherit; font-size: 13.5px; font-weight: 600; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--soft); cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .panel { margin-top: 12px; padding: 16px 18px; border-radius: var(--radius-sm); background: var(--sunk); border: 1px solid var(--border); }
+  .panel[hidden] { display: none; }
+  .panel > :first-child { margin-top: 0; }
+  .panel > :last-child { margin-bottom: 0; }
+
+  pre { position: relative; margin: 10px 0; background: var(--code-bg); color: var(--code-text); border-radius: var(--radius-sm); padding: 14px 16px; overflow-x: auto; font: 13.5px/1.6 var(--mono); }
+  pre .copy { position: absolute; top: 8px; right: 8px; font: 600 12px var(--font); padding: 3px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.08); color: #fff; cursor: pointer; }
+  pre .copy:hover { background: rgba(255,255,255,.18); }
+
+  .note { display: flex; gap: 10px; padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid; margin: 12px 0; font-size: 14.5px; }
+  .note b:first-child { flex: none; }
+  .note--warn { background: var(--warn-bg); border-color: var(--warn-border); color: var(--warn); }
+  .note--info { background: var(--info-bg); border-color: var(--info-border); color: var(--info); }
+  .note--ok { background: var(--ok-bg); border-color: transparent; color: var(--ok); }
+  .note p { margin: 0; }
+
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14.5px; background: var(--surface); border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border); }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { background: var(--sunk); font-size: 13px; color: var(--soft); font-weight: 600; }
+  tr:last-child td { border-bottom: 0; }
+  .table-scroll { overflow-x: auto; }
+
+  .shot { margin: 14px 0 4px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow); background: var(--sunk); }
+  .shot--phone { max-width: 260px; }
+  .caption { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
+
+  .tour { display: grid; gap: 18px; }
+  .tour article { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); }
+  .tour h3 { font-size: 17.5px; }
+  .tour .who { display: inline-block; font-size: 12.5px; font-weight: 600; padding: 2px 10px; border-radius: 999px; background: var(--brand-soft); color: var(--brand-700); margin: 6px 0 2px; }
+  .tour p { margin: 6px 0; }
+  .split { display: grid; grid-template-columns: 1fr 220px; gap: 18px; align-items: start; }
+
+  details { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 18px; margin-top: 10px; }
+  details[open] { padding-bottom: 14px; }
+  summary { cursor: pointer; padding: 14px 0; font-weight: 600; }
+  details p { margin: 6px 0; }
+
+  footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13.5px; }
+
+  @media (max-width: 640px) {
+    body { font-size: 15px; }
+    .step { padding: 20px 18px 18px; }
+    .step::before { position: static; margin-bottom: 10px; }
+    .split { grid-template-columns: 1fr; }
+    .shot--phone { max-width: 220px; }
+  }
+  @media print {
+    .hero { background: none; color: var(--text); padding: 0 0 20px; }
+    .paths { margin-top: 0; }
+    pre .copy, .tabs { display: none; }
+    .panel[hidden] { display: block; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="inner">
+    <div class="brand"><i>HR</i> HR PRO V.2</div>
+    <h1>คู่มือเริ่มต้นใช้งาน</h1>
+    <p>ระบบบริหารงานบุคคลครบชุด ทั้งลงเวลา การลา เงินเดือน สรรหา ประเมินผล ใช้ฟรี ติดตั้งบนเครื่องตัวเองได้ในราว 10 นาที ไม่ต้องลงฐานข้อมูลเพิ่ม</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <nav class="paths" aria-label="เลือกเส้นทาง">
+    <a class="path" href="#try">
+      <small>เส้นทาง A · แนะนำสำหรับมือใหม่</small>
+      <h2>ทดลองใช้บนเครื่องตัวเอง</h2>
+      <p>Windows, Mac หรือ Linux ดับเบิลคลิกติดตั้ง มีข้อมูลตัวอย่างและบัญชีทดลองให้ลองครบทุกบทบาท</p>
+    </a>
+    <a class="path" href="#production">
+      <small>เส้นทาง B · สำหรับผู้ดูแลระบบ</small>
+      <h2>ใช้งานจริงในบริษัท (Production)</h2>
+      <p>ขึ้นเซิร์ฟเวอร์จริง ใช้รหัสผ่านสุ่มครั้งเดียว และบังคับให้ตั้งรหัสใหม่ทันทีที่เข้าใช้ครั้งแรก</p>
+    </a>
+  </nav>
+
+  <!-- ================================================================ A -->
+  <section id="try">
+    <div class="eyebrow">เส้นทาง A</div>
+    <h2>ทดลองใช้บนเครื่องตัวเอง</h2>
+    <p class="lead">ทำตามทีละขั้น ขั้นที่ 1–3 ทำครั้งเดียว ครั้งต่อไปเริ่มจากขั้นที่ 4 ได้เลย</p>
+
+    <div class="step" id="step-php" data-n="1">
+      <h3>ติดตั้ง PHP <span style="font-weight:400;color:var(--muted)">(ครั้งเดียว ~3 นาที)</span></h3>
+      <p>HR PRO ทำงานด้วยโปรแกรม <b>PHP 8.2 ขึ้นไป</b> ถ้าเครื่องมีอยู่แล้วข้ามไปขั้นที่ 2 ได้เลย</p>
+
+      <div class="tabs" role="tablist" data-tabs>
+        <button role="tab" aria-selected="true" data-os="win">Windows</button>
+        <button role="tab" aria-selected="false" data-os="mac">macOS</button>
+        <button role="tab" aria-selected="false" data-os="linux">Linux</button>
+      </div>
+
+      <div class="panel" data-os-panel="win">
+        <ol>
+          <li>เข้า <a href="https://herd.laravel.com" target="_blank" rel="noopener">herd.laravel.com</a> แล้วกด <b>Download for Windows</b> (Laravel Herd รุ่นฟรีมี PHP พร้อมใช้งาน)</li>
+          <li>เปิดไฟล์ที่ดาวน์โหลด แล้วกด <b>Next</b> จนติดตั้งเสร็จ</li>
+          <li>เปิดหน้าต่าง <b>Command Prompt ใหม่</b> (กด <kbd>⊞ Win</kbd> พิมพ์ <code>cmd</code> แล้วกด <kbd>Enter</kbd>) แล้วพิมพ์คำสั่งนี้เพื่อเช็ก</li>
+        </ol>
+        <pre><code>php -v</code></pre>
+        <p>ถ้าขึ้น <code>PHP 8.2</code>, <code>8.3</code> หรือใหม่กว่า แปลว่าพร้อมแล้ว</p>
+      </div>
+      <div class="panel" data-os-panel="mac" hidden>
+        <p>ติดตั้ง <a href="https://herd.laravel.com" target="_blank" rel="noopener">Laravel Herd for macOS</a> (ฟรี) หรือถ้ามี Homebrew อยู่แล้ว ใช้คำสั่งนี้แทนได้</p>
+        <pre><code>brew install php</code></pre>
+        <p>แล้วเช็กใน Terminal ด้วย <code>php -v</code></p>
+      </div>
+      <div class="panel" data-os-panel="linux" hidden>
+        <p>Ubuntu 24.04 / Debian 12 ขึ้นไป:</p>
+        <pre><code>sudo apt update && sudo apt install -y php-cli php-sqlite3 php-mbstring php-xml php-curl</code></pre>
+        <p>แล้วเช็กด้วย <code>php -v</code> ต้องได้ 8.2 ขึ้นไป</p>
+      </div>
+    </div>
+
+    <div class="step" data-n="2">
+      <h3>แตกไฟล์ ZIP</h3>
+      <ol>
+        <li>คลิกขวาที่ไฟล์ ZIP แล้วเลือก <b>Extract All… / แตกไฟล์ทั้งหมด</b></li>
+        <li>เลือกที่เก็บที่จำง่าย เช่น <code>C:\HR-PRO</code> หรือโฟลเดอร์ Documents</li>
+      </ol>
+      <div class="note note--warn"><b>!</b><p>อย่าดับเบิลคลิกไฟล์จากในหน้าต่าง ZIP โดยตรง ต้องแตกไฟล์ออกมาก่อน ไม่อย่างนั้นระบบจะติดตั้งไม่ได้</p></div>
+    </div>
+
+    <div class="step" data-n="3">
+      <h3>ติดตั้งระบบ <span style="font-weight:400;color:var(--muted)">(~1 นาที)</span></h3>
+
+      <div class="tabs" role="tablist" data-tabs>
+        <button role="tab" aria-selected="true" data-os="win">Windows</button>
+        <button role="tab" aria-selected="false" data-os="mac">macOS / Linux</button>
+      </div>
+      <div class="panel" data-os-panel="win">
+        <p>ในโฟลเดอร์ที่แตกไว้ <b>ดับเบิลคลิก <code>install-windows.bat</code></b></p>
+        <div class="note note--info"><b>i</b><p>ถ้า Windows ขึ้นกรอบสีน้ำเงิน “Windows protected your PC” ให้กด <b>More info</b> แล้วกด <b>Run anyway</b> เพราะเป็นสคริปต์ที่ไม่ได้ลงลายเซ็นดิจิทัล ถ้าไม่สะดวกใจ เปิดไฟล์ด้วย Notepad เพื่อดูคำสั่งข้างในก่อนได้</p></div>
+      </div>
+      <div class="panel" data-os-panel="mac" hidden>
+        <p>เปิด Terminal ในโฟลเดอร์ที่แตกไว้ (macOS: คลิกขวาที่โฟลเดอร์ แล้วเลือก <b>New Terminal at Folder</b>) แล้วพิมพ์</p>
+        <pre><code>sh install-mac-linux.sh</code></pre>
+      </div>
+
+      <p>หน้าต่างติดตั้งจะถามคำถามเดียว:</p>
+      <pre><code>โหลดข้อมูลตัวอย่าง (พนักงาน 47 คน การลา เงินเดือน ฯลฯ) เพื่อทดลองดูระบบหรือไม่? [Y/n]</code></pre>
+      <ul>
+        <li>กด <kbd>Enter</kbd> (= ใช่) ถ้าต้องการลองดูระบบ <b>แนะนำ</b> จะได้ข้อมูลสมมุติครบทุกเมนู และบัญชีทดลอง 4 บทบาท</li>
+        <li>พิมพ์ <kbd>n</kbd> ถ้าต้องการเริ่มจากระบบว่าง มีแค่บัญชีผู้ดูแลระบบ เพื่อใส่ข้อมูลจริงเอง</li>
+      </ul>
+      <p>เมื่อขึ้นข้อความ <b style="color:var(--ok)">ติดตั้งเสร็จเรียบร้อย</b> ก็ปิดหน้าต่างได้</p>
+    </div>
+
+    <div class="step" data-n="4">
+      <h3>เปิดระบบ</h3>
+      <div class="tabs" role="tablist" data-tabs>
+        <button role="tab" aria-selected="true" data-os="win">Windows</button>
+        <button role="tab" aria-selected="false" data-os="mac">macOS / Linux</button>
+      </div>
+      <div class="panel" data-os-panel="win">
+        <p><b>ดับเบิลคลิก <code>start-windows.bat</code></b> แล้วเบราว์เซอร์จะเปิดหน้าเข้าสู่ระบบขึ้นมาเองในไม่กี่วินาที</p>
+      </div>
+      <div class="panel" data-os-panel="mac" hidden>
+        <pre><code>sh start-mac-linux.sh</code></pre>
+      </div>
+      <p>หรือเปิดเบราว์เซอร์แล้วไปที่ <a href="http://127.0.0.1:8000" target="_blank" rel="noopener"><code>http://127.0.0.1:8000</code></a> ด้วยตัวเองก็ได้</p>
+      <div class="note note--warn"><b>!</b><p><b>อย่าปิดหน้าต่างสีดำ</b> ระหว่างใช้งาน เพราะหน้าต่างนั้นคือตัวระบบ ถ้าปิดหน้าต่าง ระบบจะหยุดทำงาน ใช้งานครั้งต่อไปแค่ทำขั้นที่ 4 นี้อีกครั้ง ข้อมูลทั้งหมดยังอยู่ครบ</p></div>
+    </div>
+
+    <div class="step" id="login" data-n="5">
+      <h3>เข้าสู่ระบบด้วยบัญชีทดลอง</h3>
+      <p>ใต้ฟอร์มเข้าสู่ระบบจะมีกล่อง <b>“บัญชีทดลอง”</b> <b>คลิกที่บัญชี</b> ระบบจะกรอกอีเมลและรหัสผ่านให้ จากนั้นกด <b>เข้าสู่ระบบ</b></p>
+      <img class="shot" src="guide/01-login-demo.jpg" alt="หน้าเข้าสู่ระบบที่มีกล่องบัญชีทดลองอยู่ใต้ฟอร์ม" loading="lazy">
+      <p class="caption">กล่องบัญชีทดลองแสดงเฉพาะการติดตั้งแบบทดลองเท่านั้น และบัญชีที่เปลี่ยนรหัสผ่านแล้วจะหายออกจากกล่องเอง</p>
+
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>บทบาท</th><th>อีเมล</th><th>รหัสผ่าน</th><th>เห็นอะไรบ้าง</th></tr></thead>
+          <tbody>
+            <tr><td><b>ผู้ดูแลระบบ</b></td><td><code>admin@hrpro.local</code></td><td><code>password</code></td><td>ทุกเมนู รวมถึงผู้ใช้ สิทธิ์ และตั้งค่าระบบ</td></tr>
+            <tr><td>ฝ่ายบุคคล *</td><td><code>hr@hrpro.local</code></td><td><code>password</code></td><td>พนักงาน การลา เงินเดือน สรรหา ฝึกอบรม รายงาน</td></tr>
+            <tr><td>หัวหน้างาน *</td><td><code>manager@hrpro.local</code></td><td><code>password</code></td><td>ดูข้อมูลพนักงาน อนุมัติการลา และดูรายงาน</td></tr>
+            <tr><td>พนักงาน *</td><td><code>employee@hrpro.local</code></td><td><code>password</code></td><td>ลงเวลา ยื่นลา ดูประวัติของตัวเอง และแก้ไขโปรไฟล์</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="caption">* มีเฉพาะเมื่อเลือกโหลดข้อมูลตัวอย่างในขั้นที่ 3</p>
+      <div class="note note--info"><b>i</b><p>ลองเปลี่ยนรหัสผ่านได้ที่เมนูโปรไฟล์ (มุมขวาบน) ถ้าจะให้คนอื่นในวงแลนเข้ามาลองใช้ ควรเปลี่ยนรหัสผ่านทุกบัญชีก่อน</p></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ Tour -->
+  <section id="tour">
+    <div class="eyebrow">ทัวร์ 10 นาที</div>
+    <h2>ลองใช้ระบบตามนี้ จะเห็นภาพรวมครบ</h2>
+    <p class="lead">ตัวอย่างหน้าจอด้านล่างมาจากข้อมูลตัวอย่าง ทุกชื่อเป็นข้อมูลสมมุติ</p>
+
+    <div class="tour">
+      <article>
+        <div class="split">
+          <div>
+            <h3>① ลงเวลาเข้า–ออกงาน</h3>
+            <span class="who">ทุกบัญชี · หน้าแรกหลังเข้าสู่ระบบ</span>
+            <p>กด <b>ลงเวลาเข้างาน</b> เบราว์เซอร์จะขออนุญาตใช้ตำแหน่ง ให้กด <b>อนุญาต</b> เพื่อให้ระบบตรวจว่าอยู่ในบริเวณที่บริษัทกำหนดหรือไม่ ถ้ามาสายหรืออยู่นอกพื้นที่ ระบบจะให้กรอกเหตุผล</p>
+            <p>ใช้งานบนมือถือได้ เพียงเปิดเว็บเดียวกัน</p>
+          </div>
+          <img class="shot shot--phone" src="guide/03-time-clock-mobile.jpg" alt="หน้าลงเวลาบนมือถือ" loading="lazy">
+        </div>
+      </article>
+
+      <article>
+        <h3>② แดชบอร์ด</h3>
+        <span class="who">ผู้ดูแลระบบ · ฝ่ายบุคคล</span>
+        <p>ภาพรวมวันนี้ ได้แก่ จำนวนพนักงาน คนที่ลงเวลาแล้ว คนที่ลา และคำขอที่รออนุมัติ พร้อมสัดส่วนพนักงานแต่ละแผนกและประกาศล่าสุด</p>
+        <img class="shot" src="guide/05-dashboard.jpg" alt="แดชบอร์ด" loading="lazy">
+      </article>
+
+      <article>
+        <h3>③ ข้อมูลพนักงาน</h3>
+        <span class="who">ผู้ดูแลระบบ · ฝ่ายบุคคล</span>
+        <p>เมนู <b>พนักงาน</b> ใช้ค้นหา เพิ่ม แก้ไข และพิมพ์ประวัติหรือหนังสือรับรองการทำงานได้ทันที ส่วนเมนู <b>แผนก</b> และ <b>ตำแหน่งงาน</b> ใช้จัดโครงสร้างองค์กร และดูเป็นแผนผังได้ที่ <b>ผังองค์กร</b></p>
+        <img class="shot" src="guide/07-employees.jpg" alt="รายชื่อพนักงาน" loading="lazy">
+      </article>
+
+      <article>
+        <h3>④ ยื่นลา และอนุมัติ</h3>
+        <span class="who">เข้าด้วย employee@ แล้วสลับเป็น manager@ หรือ hr@</span>
+        <ol>
+          <li>เข้าด้วยบัญชี <b>พนักงาน</b> ไปที่ <b>การลาของฉัน</b> แล้วกด <b>ยื่นใบลา</b> เลือกประเภทและวันที่ จากนั้นส่ง</li>
+          <li>ออกจากระบบ แล้วเข้าด้วยบัญชี <b>หัวหน้างาน</b> หรือ <b>ฝ่ายบุคคล</b></li>
+          <li>ไปที่ <b>อนุมัติการลา</b> แล้วกดอนุมัติ ยอดวันลาคงเหลือของพนักงานจะถูกตัดให้อัตโนมัติ</li>
+        </ol>
+        <img class="shot" src="guide/13-leave-request-form.jpg" alt="ฟอร์มยื่นใบลา" loading="lazy">
+        <img class="shot" src="guide/15-leave-approvals.jpg" alt="หน้าอนุมัติการลา" loading="lazy">
+      </article>
+
+      <article>
+        <h3>⑤ เงินเดือน</h3>
+        <span class="who">ผู้ดูแลระบบ · ฝ่ายบุคคล</span>
+        <p>คำนวณเงินเดือนรายเดือน หักประกันสังคมและวันลาที่ไม่ได้รับค่าจ้าง แล้วพิมพ์สลิปเงินเดือนหรือทะเบียนเงินเดือนเป็น PDF</p>
+        <img class="shot" src="guide/20-payroll.jpg" alt="หน้าเงินเดือน" loading="lazy">
+      </article>
+
+      <article>
+        <h3>⑥ ผู้ใช้ สิทธิ์ และตั้งค่า</h3>
+        <span class="who">ผู้ดูแลระบบเท่านั้น</span>
+        <p>เมนู <b>ตั้งค่า</b> ใช้สร้างบัญชีให้พนักงาน กำหนดบทบาทและสิทธิ์ ตั้งเวลาเข้างาน กำหนดบริเวณลงเวลาบนแผนที่ ใส่ข้อมูลบริษัทและโลโก้ที่จะพิมพ์บนเอกสาร และกำหนดนโยบายรหัสผ่าน</p>
+        <img class="shot" src="guide/35-users.jpg" alt="หน้าจัดการผู้ใช้งาน" loading="lazy">
+      </article>
+    </div>
+  </section>
+
+  <!-- ===================================================== B Production -->
+  <section id="production">
+    <div class="eyebrow">เส้นทาง B</div>
+    <h2>ขึ้นใช้งานจริง (Production)</h2>
+    <p class="lead">ระบบเดียวกัน แต่การเข้าสู่ระบบครั้งแรกจะทำงานอีกแบบโดยอัตโนมัติ เมื่อตั้ง <code>APP_ENV=production</code></p>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th></th><th>ทดลอง (เส้นทาง A)</th><th>Production</th></tr></thead>
+        <tbody>
+          <tr><td><b>รหัสผ่านผู้ดูแลระบบครั้งแรก</b></td><td><code>password</code> ที่ทุกคนรู้</td><td><b>สุ่มใหม่ 16 ตัวอักษร</b> แสดงในหน้าต่างคำสั่งหรือ log <b>ครั้งเดียว</b> หรือใช้ค่า <code>ADMIN_PASSWORD</code> ที่ตั้งเอง</td></tr>
+          <tr><td><b>เข้าสู่ระบบครั้งแรก</b></td><td>เข้าใช้ได้ทันที</td><td><b>บังคับตั้งรหัสผ่านใหม่</b> ก่อนเปิดเมนูอื่นได้</td></tr>
+          <tr><td><b>กล่องบัญชีทดลองในหน้าเข้าสู่ระบบ</b></td><td>แสดง</td><td><b>ไม่แสดง</b></td></tr>
+          <tr><td><b>ข้อมูลตัวอย่าง</b></td><td>เลือกได้</td><td>ไม่โหลด เริ่มจากระบบว่าง</td></tr>
+          <tr><td><b>ข้อความผิดพลาด</b></td><td>แสดงรายละเอียด (<code>APP_DEBUG=true</code>)</td><td>ซ่อน (<code>APP_DEBUG=false</code>)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note note--warn"><b>!</b><p>อย่าใช้ <code>install-windows.bat</code> หรือ <code>install.php</code> กับเซิร์ฟเวอร์จริง เพราะสคริปต์เหล่านี้ตั้งค่าไว้สำหรับทดลองเท่านั้น และ<b>อย่าตั้ง <code>SEED_DEMO=true</code></b> กับระบบที่มีข้อมูลจริง เพราะจะเพิ่มพนักงานสมมุติและเปิดบัญชีทดลองที่ใช้รหัส <code>password</code></p></div>
+
+    <div class="step" data-n="1">
+      <h3>เตรียมเซิร์ฟเวอร์</h3>
+      <ul>
+        <li>ใช้ PHP 8.2 ขึ้นไป กับ Nginx หรือ Apache และตั้ง <b>document root ไปที่โฟลเดอร์ <code>public/</code></b></li>
+        <li>ฐานข้อมูลเลือกได้ระหว่าง MySQL 8 หรือ MariaDB 10.6 ขึ้นไป (แนะนำ) หรือ SQLite สำหรับองค์กรเล็ก</li>
+        <li>เปิด HTTPS ให้เรียบร้อย</li>
+      </ul>
+    </div>
+
+    <div class="step" data-n="2">
+      <h3>ตั้งค่าไฟล์ <code>.env</code></h3>
+      <pre><code>cp .env.example .env
+php artisan key:generate</code></pre>
+      <p>จากนั้นเปิดไฟล์ <code>.env</code> แล้วแก้ค่าต่อไปนี้</p>
+      <pre><code>APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://hr.บริษัทของคุณ.com
+
+DB_CONNECTION=mysql
+DB_DATABASE=hr_pro
+DB_USERNAME=...
+DB_PASSWORD=...
+
+SEED_DEMO=false
+ADMIN_EMAIL=อีเมลจริงของผู้ดูแลระบบ
+ADMIN_PASSWORD=          # เว้นว่างไว้ ระบบจะสุ่มรหัสให้ (แนะนำ)
+
+SESSION_SECURE_COOKIE=true
+HRPRO_COMPANY_NAME="ชื่อบริษัทของคุณ"</code></pre>
+    </div>
+
+    <div class="step" data-n="3">
+      <h3>สร้างฐานข้อมูล แล้ว<b>จดรหัสผ่านครั้งแรก</b></h3>
+      <pre><code>composer install --no-dev --optimize-autoloader   # ข้ามได้ถ้าใช้โฟลเดอร์ vendor จาก ZIP
+php artisan migrate --seed --force
+php artisan storage:link
+php artisan config:cache && php artisan route:cache && php artisan view:cache</code></pre>
+      <p>คำสั่ง <code>migrate --seed</code> จะแสดงกล่องแบบนี้ <b>เพียงครั้งเดียว</b></p>
+      <pre><code>  HR PRO — บัญชีผู้ดูแลระบบสำหรับเข้าสู่ระบบครั้งแรก
+  อีเมล      : it@yourcompany.com
+  รหัสผ่าน   : q7RmX2vKp9LtW4sN
+  รหัสผ่านนี้สุ่มขึ้นใหม่และจะแสดงเพียงครั้งเดียว — คัดลอกเก็บไว้ตอนนี้
+  ระบบจะบังคับให้ตั้งรหัสผ่านใหม่ทันทีที่เข้าสู่ระบบครั้งแรก</code></pre>
+      <p>รหัสในตัวอย่างนี้เป็นเพียงตัวอย่าง ระบบจริงจะสุ่มรหัสใหม่ทุกครั้งที่ติดตั้ง</p>
+    </div>
+
+    <div class="step" data-n="4">
+      <h3>เข้าสู่ระบบครั้งแรก แล้วตั้งรหัสผ่านของตัวเอง</h3>
+      <p>เข้าสู่ระบบด้วยอีเมลและรหัสผ่านจากขั้นที่ 3 แล้วระบบจะพาไปหน้า <b>ตั้งรหัสผ่านใหม่</b> ทันที ซึ่งต้องตั้งรหัสที่ไม่ซ้ำกับรหัสชั่วคราวก่อนจึงจะเปิดเมนูอื่นได้ จากนั้นรหัสชั่วคราวจะใช้ไม่ได้อีก</p>
+      <p>ต่อจากนั้น ไปที่ <b>ตั้งค่า</b> เพื่อใส่ข้อมูลบริษัท สร้างแผนก ตำแหน่ง และบัญชีผู้ใช้ให้พนักงาน</p>
+    </div>
+
+    <div class="step" data-n="5">
+      <h3>ตั้งงานตามเวลา (cron)</h3>
+      <p>ใช้สำหรับงานอัตโนมัติ เช่น ลบรูปถ่ายลงเวลาที่เกินระยะเก็บ ให้เพิ่มบรรทัดนี้ใน crontab ของเซิร์ฟเวอร์</p>
+      <pre><code>* * * * * cd /path/to/hr-pro && php artisan schedule:run >> /dev/null 2>&1</code></pre>
+    </div>
+
+    <h3 style="margin-top:28px">ใช้ Docker / Render แทนการตั้งเซิร์ฟเวอร์เอง</h3>
+    <p>ในแพ็กมี <code>Dockerfile</code> และ <code>render.yaml</code> อยู่แล้ว (ค่าเริ่มต้นเป็น production) ให้ตั้ง environment variable <code>ADMIN_EMAIL</code> บนหน้า dashboard ของผู้ให้บริการ และเว้น <code>SEED_DEMO</code> ไว้ เมื่อ deploy ครั้งแรก รหัสผ่านสุ่มจะแสดงใน <b>deploy log / container log</b> หรือจะตั้ง <code>ADMIN_PASSWORD</code> เป็นค่าลับเองก็ได้ ซึ่งก็ยังต้องเปลี่ยนรหัสเมื่อเข้าใช้ครั้งแรกเช่นกัน</p>
+    <pre><code>docker build -t hr-pro .
+docker run -p 8080:8080 -e ADMIN_EMAIL=it@yourcompany.com hr-pro</code></pre>
+    <div class="note note--info"><b>i</b><p>ถ้าต้องการเปิด<b>เว็บเดโมสาธารณะ</b> (ให้คนทั่วไปลองเล่น) ให้ตั้ง <code>SEED_DEMO=true</code> ระบบจะกลับไปใช้บัญชีทดลองและแสดงกล่องบัญชีทดลอง แม้จะเป็น production ก็ตาม</p></div>
+
+    <h3 style="margin-top:28px" id="lost-password">ลืมรหัสผ่านผู้ดูแลระบบ หรือไม่ทันเห็นรหัสครั้งแรก</h3>
+    <p>รันคำสั่งนี้บนเซิร์ฟเวอร์ ระบบจะออกรหัสชั่วคราวใหม่ (แสดงครั้งเดียว) และบังคับให้เปลี่ยนรหัสเมื่อเข้าสู่ระบบ</p>
+    <pre><code>php artisan hrpro:admin-password                      # บัญชีตาม ADMIN_EMAIL
+php artisan hrpro:admin-password someone@yourcompany.com   # หรือระบุบัญชีอื่น</code></pre>
+  </section>
+
+  <!-- ============================================================= FAQ -->
+  <section id="faq">
+    <div class="eyebrow">แก้ปัญหาที่พบบ่อย</div>
+    <h2>ติดปัญหา ลองดูตรงนี้ก่อน</h2>
+
+    <details>
+      <summary>ขึ้นว่า “'php' is not recognized…” หรือ “ไม่พบโปรแกรม PHP”</summary>
+      <p>ยังไม่ได้ติดตั้ง PHP หรือติดตั้งแล้วแต่ยังไม่ได้เปิดหน้าต่างใหม่ ให้ทำ<a href="#step-php">ขั้นที่ 1</a> แล้ว<b>ปิดหน้าต่างเก่าทั้งหมด</b>ก่อนดับเบิลคลิกใหม่ ถ้ายังไม่หาย ให้ restart เครื่องหนึ่งครั้ง</p>
+    </details>
+    <details>
+      <summary>ขึ้นว่า “PHP ยังไม่ได้เปิดส่วนขยาย: pdo_sqlite …”</summary>
+      <p>หน้าต่างติดตั้งจะบอกตำแหน่งไฟล์ <code>php.ini</code> ให้เปิดไฟล์นั้นด้วย Notepad ค้นหาบรรทัด <code>;extension=pdo_sqlite</code> (หรือชื่อส่วนขยายที่ขึ้นมา) แล้วลบเครื่องหมาย <code>;</code> ด้านหน้าออก จากนั้นบันทึกและติดตั้งใหม่ ถ้าใช้ Laravel Herd ส่วนขยายที่จำเป็นจะเปิดไว้ให้ครบแล้ว</p>
+    </details>
+    <details>
+      <summary>เบราว์เซอร์ขึ้น “This site can’t be reached / ไม่สามารถเข้าถึงไซต์นี้”</summary>
+      <p>ตรวจว่าหน้าต่างสีดำของ <code>start-windows.bat</code> ยังเปิดอยู่ ถ้าเพิ่งเปิด ให้รอ 2–3 วินาทีแล้วกด <kbd>F5</kbd></p>
+    </details>
+    <details>
+      <summary>ขึ้นว่า port 8000 ถูกใช้งานอยู่</summary>
+      <p>อาจเปิด <code>start-windows.bat</code> ซ้อนกันอยู่ 2 หน้าต่าง ให้ปิดหน้าต่างที่เกินไป หรือเปิดระบบที่ port อื่นด้วยคำสั่ง <code>php artisan serve --port=8080</code> แล้วเข้า <code>http://127.0.0.1:8080</code></p>
+    </details>
+    <details>
+      <summary>กดลงเวลาไม่ได้ ระบบบอกว่าไม่ทราบตำแหน่ง</summary>
+      <p>ให้อนุญาตตำแหน่งในเบราว์เซอร์ โดยคลิกไอคอนรูปแม่กุญแจหรือไอคอนตั้งค่าหน้าเว็บที่ช่อง URL แล้วเลือก Location → Allow ส่วนบนคอมพิวเตอร์ตั้งโต๊ะ ตำแหน่งอาจคลาดเคลื่อนได้ ผู้ดูแลระบบปรับความเข้มงวดได้ที่ ตั้งค่า → การลงเวลา</p>
+    </details>
+    <details>
+      <summary>ลืมรหัสผ่านบนเครื่องทดลอง</summary>
+      <p>เปิด Command Prompt ในโฟลเดอร์ HR PRO แล้วพิมพ์ <code>php artisan hrpro:admin-password</code> ระบบจะแสดงรหัสชั่วคราวใหม่ให้</p>
+    </details>
+    <details>
+      <summary>อยากล้างข้อมูลทั้งหมดแล้วเริ่มใหม่</summary>
+      <p>ดับเบิลคลิก <code>install-windows.bat</code> อีกครั้ง เมื่อระบบถามว่า “ต้องการล้างข้อมูลทั้งหมดแล้วติดตั้งใหม่หรือไม่?” ให้พิมพ์ <kbd>y</kbd> <b>ข้อมูลเดิมจะหายทั้งหมด</b></p>
+    </details>
+    <details>
+      <summary>ข้อมูลเก็บไว้ที่ไหน สำรองอย่างไร</summary>
+      <p>บนเครื่องทดลอง ข้อมูลทั้งหมดอยู่ในไฟล์เดียวคือ <code>database/database.sqlite</code> ส่วนรูปและไฟล์แนบอยู่ใน <code>storage/app</code> คัดลอก 2 ที่นี้ไว้ก็สำรองข้อมูลได้ครบ</p>
+    </details>
+  </section>
+
+  <footer>
+    HR PRO V.2 · รายละเอียดสำหรับนักพัฒนาดูได้ใน <code>README.md</code>
+  </footer>
+</main>
+
+<script>
+  // Platform tabs: each step's tabs switch only its own panels; the first
+  // pick of an OS is remembered for the other steps.
+  (function () {
+    var groups = document.querySelectorAll('[data-tabs]');
+
+    function show(group, os) {
+      var step = group.parentElement;
+      var has = step.querySelector('[data-os-panel="' + os + '"]');
+      if (!has && os === 'linux') { os = 'mac'; has = step.querySelector('[data-os-panel="mac"]'); }
+      if (!has) return;
+      group.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-selected', String(b.dataset.os === os)); });
+      step.querySelectorAll('[data-os-panel]').forEach(function (p) { p.hidden = p.dataset.osPanel !== os; });
+    }
+
+    var guess = /Mac/.test(navigator.platform) ? 'mac' : (/Linux/.test(navigator.platform) ? 'linux' : 'win');
+    groups.forEach(function (group) {
+      show(group, guess);
+      group.addEventListener('click', function (e) {
+        var btn = e.target.closest('button');
+        if (!btn) return;
+        groups.forEach(function (g) { show(g, btn.dataset.os); });
+      });
+    });
+  })();
+
+  // Copy buttons on every command block.
+  document.querySelectorAll('pre').forEach(function (pre) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'copy';
+    btn.textContent = 'คัดลอก';
+    btn.addEventListener('click', function () {
+      var text = pre.querySelector('code').innerText;
+      var done = function () { btn.textContent = 'คัดลอกแล้ว ✓'; setTimeout(function () { btn.textContent = 'คัดลอก'; }, 1600); };
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(done, function () {});
+      } else {
+        var range = document.createRange();
+        range.selectNodeContents(pre.querySelector('code'));
+        getSelection().removeAllRanges();
+        getSelection().addRange(range);
+        document.execCommand('copy');
+        done();
+      }
+    });
+    pre.appendChild(btn);
+  });
+</script>
+</body>
+</html>

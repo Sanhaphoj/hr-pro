@@ -20,7 +20,7 @@
                     <x-input name="start_date" type="date" label="วันที่เริ่มลา" :required="true" />
                     <x-input name="end_date" type="date" label="วันที่สิ้นสุดการลา" :required="true" />
                     <div class="col-span-2">
-                        <x-textarea name="reason" label="เหตุผลการลา" :required="true" :rows="4"
+                        <x-textarea name="reason" label="เหตุผลการลา" :required="(bool) config('hrpro.leave.reason_required', true)" :rows="4"
                                     hint="ไม่เกิน 500 ตัวอักษร" />
                     </div>
                     <div class="col-span-2">
@@ -29,12 +29,12 @@
                             <input type="file" id="attachment" name="attachment"
                                    accept=".jpg,.jpeg,.png,.pdf,image/*,application/pdf"
                                    class="input @error('attachment') is-invalid @enderror">
-                            <span class="field__hint">รองรับไฟล์ jpg, png หรือ pdf ขนาดไม่เกิน 4 MB</span>
+                            <span class="field__hint">รองรับไฟล์ jpg, png หรือ pdf ขนาดไม่เกิน {{ (int) config('hrpro.leave.attachment_max_mb', 4) }} MB</span>
                             @error('attachment')<span class="field__error">{{ $message }}</span>@enderror
                         </div>
                     </div>
                 </div>
-                <div style="margin-top:18px;">
+                <div class="section-gap">
                     <x-button type="submit" icon="check">ส่งคำขอลา</x-button>
                 </div>
             </form>

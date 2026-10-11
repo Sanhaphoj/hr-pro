@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
         // demo dataset (employees, leave, attendance, payroll, …) — used by
         // the public live demo. A normal install leaves this off so you start
         // with a clean database and connect your own data.
-        if (filter_var(env('SEED_DEMO', false), FILTER_VALIDATE_BOOLEAN)) {
+        if (config('hrpro.demo')) {
             $this->call(DemoDataSeeder::class);
         }
     }

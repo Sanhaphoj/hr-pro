@@ -4,7 +4,11 @@
 @section('content')
     <x-page-header
         title="รายงานและสถิติ"
-        subtitle="ภาพรวมเชิงวิเคราะห์ของบุคลากร การลา และการลงเวลา ประจำปี {{ $year + 543 }}" />
+        subtitle="ภาพรวมเชิงวิเคราะห์ของบุคลากร การลา และการลงเวลา ประจำปี {{ $year + 543 }}">
+        <x-slot:actions>
+            <x-button type="button" variant="secondary" icon="printer" onclick="window.print()">พิมพ์รายงาน</x-button>
+        </x-slot:actions>
+    </x-page-header>
 
     {{-- Top-line headcount tiles --}}
     <div class="stats">
@@ -50,7 +54,7 @@
         </x-card>
     </div>
 
-    <div class="grid grid--2" style="margin-top:18px;">
+    <div class="grid grid--2 section-gap">
         {{-- Headcount by employment type --}}
         <x-card title="จำนวนพนักงานแยกตามประเภทการจ้าง">
             <div class="table-wrap">
@@ -108,13 +112,13 @@
     </div>
 
     {{-- Leave usage this year by leave type --}}
-    <div style="margin-top:18px;">
+    <div class="section-gap">
         <x-card title="การใช้วันลาแยกตามประเภท (อนุมัติแล้ว)" subtitle="รวมจำนวนวันลาที่อนุมัติแล้วในปี {{ $year + 543 }}">
             @if($leaveUsage->isEmpty())
                 <x-empty icon="calendar" title="ยังไม่มีประเภทการลา" message="กำหนดประเภทการลาเพื่อดูสถิติการใช้งาน" />
             @else
                 <div class="table-wrap">
-                    <table class="table">
+                    <table class="table table--cards">
                         <thead>
                             <tr>
                                 <th>ประเภทการลา</th>
@@ -128,9 +132,9 @@
                             @foreach($leaveUsage as $row)
                                 <tr>
                                     <td class="cell-strong">{{ $row['name'] }}</td>
-                                    <td class="cell-sub text-right">{{ number_format($row['request_count']) }}</td>
-                                    <td class="cell-strong text-right">{{ number_format($row['total_days'], 1) }} วัน</td>
-                                    <td style="min-width:160px;">
+                                    <td class="cell-sub text-right" data-label="จำนวนคำขอ">{{ number_format($row['request_count']) }}</td>
+                                    <td class="cell-strong text-right" data-label="รวมวันลา">{{ number_format($row['total_days'], 1) }} วัน</td>
+                                    <td class="report-bar" data-label="สัดส่วนการใช้งาน">
                                         <div class="progress"><span style="width: {{ round($row['total_days'] / $leaveMax * 100) }}%"></span></div>
                                     </td>
                                 </tr>
@@ -140,7 +144,7 @@
                             <tr>
                                 <td class="cell-strong">รวมทั้งหมด</td>
                                 <td></td>
-                                <td class="cell-strong text-right">{{ number_format($leaveUsageTotalDays, 1) }} วัน</td>
+                                <td class="cell-strong text-right" data-label="รวมวันลา">{{ number_format($leaveUsageTotalDays, 1) }} วัน</td>
                                 <td></td>
                             </tr>
                         </tfoot>

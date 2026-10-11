@@ -20,6 +20,7 @@ use App\Models\Role;
 use App\Models\TrainingCourse;
 use App\Models\TrainingEnrollment;
 use App\Models\User;
+use App\Models\WorkLocation;
 use App\Services\PayrollService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
@@ -262,15 +263,46 @@ class DemoDataSeeder extends Seeder
             ]);
         }
 
+        // A request is written before it is decided and before the leave
+        // starts. Rows above are stamped "now", which puts the date on the
+        // printed leave form after its approval; move each submission back.
+        LeaveRequest::query()->each(function (LeaveRequest $request) {
+            $submitted = collect([
+                $request->approved_at?->copy()->subDays(fake()->numberBetween(1, 3)),
+                $request->start_date->copy()->subDays(fake()->numberBetween(3, 10))->setTime(9, 0),
+            ])->filter()->min();
+
+            if ($submitted->lt($request->created_at)) {
+                $request->forceFill(['created_at' => $submitted, 'updated_at' => $request->approved_at ?? $submitted])->saveQuietly();
+            }
+        });
+
+        // --- Work locations (geofences employees may clock in from) --------
+        $workLocationDefs = [
+            ['สำนักงานใหญ่ (สีลม)', 'HQ', 'อาคารสำนักงานใหญ่ ถนนสีลม เขตบางรัก กรุงเทพฯ', 13.7248640, 100.5340240, 200],
+            ['สาขาลาดพร้าว', 'BR-LP', 'ศูนย์ปฏิบัติการลาดพร้าว เขตจตุจักร กรุงเทพฯ', 13.8161380, 100.5601120, 150],
+            ['คลังสินค้าบางนา', 'WH-BN', 'คลังสินค้าบางนา–ตราด กม.19 สมุทรปราการ', 13.6015480, 100.7013260, 300],
+        ];
+        $workLocations = collect($workLocationDefs)->map(fn ($w) => WorkLocation::create([
+            'name' => $w[0],
+            'code' => $w[1],
+            'address' => $w[2],
+            'latitude' => $w[3],
+            'longitude' => $w[4],
+            'radius_meters' => $w[5],
+            'is_active' => true,
+        ]));
+        $headOffice = $workLocations->first();
+
         // --- Attendance history (past ~2 weeks of working days) -----------
         $historyEmployees = $allEmployees
             ->where('id', '!=', $demoEmployee->id)
             ->random(min(28, max($allEmployees->count() - 1, 1)));
         foreach ($historyEmployees as $emp) {
-            $this->seedAttendanceHistory($emp, true);
+            $this->seedAttendanceHistory($emp, true, $headOffice);
         }
         // Demo employee: seed past days but leave today open for a live clock-in demo.
-        $this->seedAttendanceHistory($demoEmployee, false);
+        $this->seedAttendanceHistory($demoEmployee, false, $headOffice);
 
         // --- Announcements -------------------------------------------------
         $admin = $demoUsers['super-admin'];
@@ -418,8 +450,9 @@ class DemoDataSeeder extends Seeder
     /**
      * Create attendance rows for the past ~2 weeks of weekdays for one employee.
      * Includes occasional lateness/absence, and (optionally) today's record.
+     * Punches are stamped inside $at so the location column has something to show.
      */
-    private function seedAttendanceHistory(Employee $employee, bool $includeToday): void
+    private function seedAttendanceHistory(Employee $employee, bool $includeToday, WorkLocation $at): void
     {
         for ($d = $includeToday ? 0 : 1; $d <= 14; $d++) {
             $date = now()->subDays($d);
@@ -443,14 +476,49 @@ class DemoDataSeeder extends Seeder
             $clockOut = $stillWorking ? null : (clone $clockIn)->addHours(8)->addMinutes(fake()->numberBetween(0, 55));
             $late = $clockIn->hour > 9 || ($clockIn->hour === 9 && $clockIn->minute > 15);
 
+            $inAt = $this->pointNear($at);
+            $outAt = $this->pointNear($at);
+
             Attendance::create([
                 'employee_id' => $employee->id,
                 'work_date' => $date->toDateString(),
                 'clock_in' => $clockIn,
+                'clock_in_location_id' => $at->id,
+                'clock_in_latitude' => $inAt['latitude'],
+                'clock_in_longitude' => $inAt['longitude'],
+                'clock_in_accuracy' => fake()->numberBetween(8, 40),
+                'clock_in_distance' => $inAt['distance'],
                 'clock_out' => $clockOut,
+                'clock_out_location_id' => $clockOut ? $at->id : null,
+                'clock_out_latitude' => $clockOut ? $outAt['latitude'] : null,
+                'clock_out_longitude' => $clockOut ? $outAt['longitude'] : null,
+                'clock_out_accuracy' => $clockOut ? fake()->numberBetween(8, 40) : null,
+                'clock_out_distance' => $clockOut ? $outAt['distance'] : null,
                 'worked_minutes' => $clockOut ? (int) $clockIn->diffInMinutes($clockOut) : 0,
                 'status' => $late ? 'late' : 'present',
             ]);
         }
+    }
+
+    /**
+     * A random point comfortably inside the zone, so seeded punches look like
+     * real readings taken somewhere on the premises rather than dead centre.
+     *
+     * @return array{latitude: float, longitude: float, distance: int}
+     */
+    private function pointNear(WorkLocation $location): array
+    {
+        $metersPerDegree = 111_320;
+        $distance = fake()->numberBetween(0, (int) ($location->radius_meters * 0.7));
+        $bearing = deg2rad(fake()->numberBetween(0, 359));
+
+        $north = $distance * cos($bearing);
+        $east = $distance * sin($bearing);
+
+        return [
+            'latitude' => round($location->latitude + $north / $metersPerDegree, 7),
+            'longitude' => round($location->longitude + $east / ($metersPerDegree * cos(deg2rad($location->latitude))), 7),
+            'distance' => $distance,
+        ];
     }
 }

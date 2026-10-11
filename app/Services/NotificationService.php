@@ -44,7 +44,8 @@ class NotificationService
      */
     protected function sendEmail(User $user, string $title, string $message, ?string $link): void
     {
-        if (! $user->email) {
+        // Settings → Notifications can switch email off; in-app notices stay.
+        if (! $user->email || ! config('hrpro.notifications.email', true)) {
             return;
         }
 

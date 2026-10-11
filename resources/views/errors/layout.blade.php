@@ -6,6 +6,7 @@
     <title>@yield('code') · {{ config('app.name', 'HR PRO') }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    @include('partials.favicon')
 </head>
 <body style="background:var(--c-bg);">
     <div style="min-height:100vh; display:grid; place-items:center; padding:24px;">

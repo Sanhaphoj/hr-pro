@@ -2,7 +2,9 @@
 # ---------------------------------------------------------------------------
 # HR PRO container startup: prepare app, migrate, seed once, serve.
 # Seeding always creates roles/permissions + one admin account; the full demo
-# dataset is loaded only when SEED_DEMO=true (see DatabaseSeeder).
+# dataset is loaded only when SEED_DEMO=true (see DatabaseSeeder). Without
+# SEED_DEMO the admin's one-time password is printed below — read it in the
+# container / deploy logs.
 # ---------------------------------------------------------------------------
 set -e
 cd /var/www/html
