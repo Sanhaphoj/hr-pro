@@ -42,6 +42,10 @@
             <a href="{{ route('notifications.index') }}" class="nav__link" style="color:var(--c-text);">
                 <x-icon name="bell" /> <span>การแจ้งเตือน @if($unread > 0)<x-badge color="red">{{ $unread }}</x-badge>@endif</span>
             </a>
+            {{-- Shown only when the browser offers installation. --}}
+            <button type="button" class="nav__link" data-install hidden style="width:100%; background:none; border:0; cursor:pointer; color:var(--c-text);">
+                <x-icon name="download" /> <span>ติดตั้งแอปบนเครื่อง</span>
+            </button>
             <form method="POST" action="{{ route('logout') }}" style="border-top:1px solid var(--c-border); margin-top:4px; padding-top:4px;">
                 @csrf
                 <button type="submit" class="nav__link" style="width:100%; background:none; border:0; cursor:pointer; color:var(--c-danger);">

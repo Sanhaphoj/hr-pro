@@ -13,6 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset_v('css/app.css') }}">
     @include('partials.favicon')
+    @include('partials.pwa-head')
     {{-- Appearance is applied before first paint. `auto` resolves against the
          operating system, and the rail state is restored here too, so nothing
          flashes the wrong colours on load. --}}

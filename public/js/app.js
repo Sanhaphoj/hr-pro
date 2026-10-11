@@ -370,6 +370,32 @@
         document.querySelectorAll('[data-cmdk-open]').forEach(function (btn) { btn.addEventListener('click', open); });
     }
 
+    // --- Installable app ----------------------------------------------------
+    if ('serviceWorker' in navigator && window.isSecureContext) {
+        window.addEventListener('load', function () {
+            navigator.serviceWorker.register('/sw.js').catch(function () { /* the site still works without it */ });
+        });
+    }
+    let installPrompt = null;
+    window.addEventListener('beforeinstallprompt', function (e) {
+        e.preventDefault();
+        installPrompt = e;
+        document.querySelectorAll('[data-install]').forEach(function (btn) { btn.hidden = false; });
+    });
+    document.querySelectorAll('[data-install]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            if (!installPrompt) return;
+            installPrompt.prompt();
+            installPrompt.userChoice.finally(function () {
+                installPrompt = null;
+                document.querySelectorAll('[data-install]').forEach(function (b) { b.hidden = true; });
+            });
+        });
+    });
+    window.addEventListener('appinstalled', function () {
+        window.hrproToast && window.hrproToast('ติดตั้งแอปเรียบร้อยแล้ว เปิดได้จากหน้าจอหลัก');
+    });
+
     // --- Navigation progress -------------------------------------------------
     // A thin bar along the top while the next page loads, so a slow server
     // (or a sleeping free host) never looks like a dead click.

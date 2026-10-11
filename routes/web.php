@@ -12,6 +12,7 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\JobPostingController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\ManifestController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\PerformanceReviewController;
@@ -44,6 +45,9 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
 });
+
+// Installable app (PWA). Public: the browser fetches it without cookies.
+Route::get('/manifest.webmanifest', ManifestController::class)->name('manifest');
 
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->middleware('auth')
