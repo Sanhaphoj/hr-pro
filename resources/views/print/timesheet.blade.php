@@ -78,10 +78,11 @@
                                 default => '',
                             };
                             $notes = array_filter([
-                                $day['leave'] ? ($day['leave']->leaveType?->name ?? 'ลา') : null,
+                                $day['leave'] && $day['working'] ? ($day['leave']->leaveType?->name ?? 'ลา') : null,
                                 $record?->late_reason ? 'สาย: '.$record->late_reason : null,
                                 $record?->left_early ? 'ออกก่อนเวลา'.($record->early_leave_reason ? ': '.$record->early_leave_reason : '') : null,
-                                $record?->clock_in_off_site_reason ? 'นอกสถานที่: '.$record->clock_in_off_site_reason : null,
+                                $record?->clock_in_off_site_reason ? 'เข้างานนอกสถานที่: '.$record->clock_in_off_site_reason : null,
+                                $record?->clock_out_off_site_reason ? 'ออกงานนอกสถานที่: '.$record->clock_out_off_site_reason : null,
                             ]);
                         @endphp
                         <tr @class(['is-off' => ! $day['working'] && ! $record, 'is-alert' => $day['missing']])>

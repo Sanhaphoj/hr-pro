@@ -83,14 +83,16 @@ class Payroll extends Model
             ->where('employee_id', $this->employee_id)
             ->where('period_year', $this->period_year)
             ->where('period_month', '<=', $this->period_month)
-            ->selectRaw('COUNT(*) as cnt, COALESCE(SUM(base_salary + allowances + overtime_pay), 0) as earnings,
+            // Aliased ytd_*: a plain "earnings" would be read through this
+            // model's earnings accessor instead of the query's column.
+            ->selectRaw('COUNT(*) as cnt, COALESCE(SUM(base_salary + allowances + overtime_pay), 0) as ytd_earnings,
                 COALESCE(SUM(deductions), 0) as ded, COALESCE(SUM(net_pay), 0) as net,
                 COALESCE(SUM(withholding_tax), 0) as tax, COALESCE(SUM(social_security), 0) as sso')
             ->first();
 
         return [
             'count' => (int) $ytd->cnt,
-            'earnings' => (float) $ytd->earnings,
+            'earnings' => (float) $ytd->ytd_earnings,
             'deductions' => (float) $ytd->ded,
             'net' => (float) $ytd->net,
             'tax' => (float) $ytd->tax,

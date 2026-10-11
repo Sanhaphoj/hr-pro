@@ -18,13 +18,16 @@
     $year = $leaveRequest->start_date->year;
     $entitled = $balance ? (float) $balance->entitled_days : (float) ($leaveRequest->leaveType?->days_per_year ?? 0);
     $thisTime = (float) $leaveRequest->total_days;
+    // A rejected or cancelled request uses none of the entitlement.
+    $counts = in_array($status, [LeaveRequest::STATUS_APPROVED, LeaveRequest::STATUS_PENDING], true);
+    $counted = $counts ? $thisTime : 0.0;
     $decided = in_array($status, [LeaveRequest::STATUS_APPROVED, LeaveRequest::STATUS_REJECTED], true);
     $approverName = $leaveRequest->approver?->name
         ?? ($status === LeaveRequest::STATUS_APPROVED ? 'อนุมัติอัตโนมัติโดยระบบ' : null);
 @endphp
 
 @section('title', 'ใบลา · '.($employee?->full_name ?? '—'))
-@section('filename', sprintf('ใบลา_%s_%s', $employee?->employee_code ?? $leaveRequest->id, $leaveRequest->start_date->format('Y-m-d')))
+@section('filename', sprintf('ใบลา_%s_%d-%02d-%02d', $employee?->employee_code ?? $leaveRequest->id, $leaveRequest->start_date->year + 543, $leaveRequest->start_date->month, $leaveRequest->start_date->day))
 @section('back', route('leave-requests.show', $leaveRequest))
 
 @section('content')
@@ -87,9 +90,9 @@
                         <td>{{ $typeName }}</td>
                         <td class="num">{{ $entitled > 0 ? $days($entitled) : 'ไม่จำกัด' }}</td>
                         <td class="num">{{ $days($takenBefore) }}</td>
-                        <td class="num">{{ $days($thisTime) }}</td>
-                        <td class="num"><b>{{ $days($takenBefore + $thisTime) }}</b></td>
-                        <td class="num">{{ $entitled > 0 ? $days(max(0, $entitled - $takenBefore - $thisTime)) : '—' }}</td>
+                        <td class="num">{{ $days($thisTime) }}@unless($counts) <small>(ไม่นับ)</small>@endunless</td>
+                        <td class="num"><b>{{ $days($takenBefore + $counted) }}</b></td>
+                        <td class="num">{{ $entitled > 0 ? $days(max(0, $entitled - $takenBefore - $counted)) : '—' }}</td>
                     </tr>
                 </tbody>
             </table>

@@ -6,7 +6,7 @@
 
 @section('orientation', 'landscape')
 @section('title', 'ทะเบียนรายชื่อพนักงาน')
-@section('filename', 'ทะเบียนรายชื่อพนักงาน_'.thai_date(now(), 'numeric'))
+@section('filename', sprintf('ทะเบียนรายชื่อพนักงาน_%d-%02d-%02d', now()->year + 543, now()->month, now()->day))
 @section('back', route('employees.index', request()->only(['q', 'department_id', 'status'])))
 
 @section('content')

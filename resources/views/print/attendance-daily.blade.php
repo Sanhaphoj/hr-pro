@@ -8,7 +8,7 @@
 
 @section('orientation', 'landscape')
 @section('title', 'รายงานการลงเวลาประจำวัน · '.thai_date($date))
-@section('filename', 'รายงานลงเวลาประจำวัน_'.$date->format('Y-m-d'))
+@section('filename', sprintf('รายงานลงเวลาประจำวัน_%d-%02d-%02d', $date->year + 543, $date->month, $date->day))
 @section('back', route('attendance.index', ['date' => $date->toDateString()]))
 
 @section('options')
@@ -24,7 +24,7 @@
                           :meta="['ประจำ' => $dayLabel]" />
 
         @unless($working)
-            <p class="doc-filter">วันนี้ไม่ใช่วันทำงานตามปฏิทินบริษัท</p>
+            <p class="doc-filter">{{ $date->isToday() ? 'วันนี้' : 'วันที่เลือก' }}ไม่ใช่วันทำงานตามปฏิทินบริษัท</p>
         @endunless
 
         <div class="doc-stats">
@@ -70,7 +70,8 @@
                                     $row['leave'] ? ($row['leave']->leaveType?->name ?? 'ลา') : null,
                                     $record?->late_reason ? 'สาย: '.$record->late_reason : null,
                                     $record?->left_early ? 'ออกก่อนเวลา'.($record->early_leave_reason ? ': '.$record->early_leave_reason : '') : null,
-                                    $record?->clock_in_off_site_reason ? 'นอกสถานที่: '.$record->clock_in_off_site_reason : null,
+                                    $record?->clock_in_off_site_reason ? 'เข้างานนอกสถานที่: '.$record->clock_in_off_site_reason : null,
+                                    $record?->clock_out_off_site_reason ? 'ออกงานนอกสถานที่: '.$record->clock_out_off_site_reason : null,
                                 ]);
                             @endphp
                             <tr @class(['is-alert' => $row['missing'] && $isPast])>

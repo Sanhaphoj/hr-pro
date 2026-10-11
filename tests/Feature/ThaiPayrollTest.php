@@ -64,6 +64,27 @@ class ThaiPayrollTest extends TestCase
         $this->assertEquals(round(30000 + 1000 + 1875 - (float) $slip->deductions, 2), (float) $slip->net_pay);
     }
 
+    public function test_year_to_date_totals_add_up_the_earlier_slips(): void
+    {
+        config(['hrpro.payroll.withholding_tax.enabled' => false, 'hrpro.payroll.social_security.enabled' => false]);
+        $hr = $this->userWithRole('hr-manager', ['base_salary' => 30000]);
+        foreach ([1, 2, 3] as $month) {
+            $this->actingAs($hr)->post(route('payroll.generate'), ['year' => 2026, 'month' => $month]);
+        }
+        $march = Payroll::where('period_month', 3)->firstOrFail();
+        app(\App\Services\PayrollService::class)->recalculate($march, 10, 0);   // 1,875 OT
+
+        $ytd = $march->fresh()->yearToDate();
+
+        $this->assertSame(3, $ytd['count']);
+        $this->assertEqualsWithDelta(91875.0, $ytd['earnings'], 0.001);
+        $this->assertEqualsWithDelta(91875.0, $ytd['net'], 0.001);
+
+        $this->actingAs($hr)->get(route('payroll.print', $march))
+            ->assertOk()
+            ->assertSee('91,875.00');
+    }
+
     public function test_a_confirmed_slip_cannot_be_edited(): void
     {
         $hr = $this->userWithRole('hr-manager', ['base_salary' => 30000]);

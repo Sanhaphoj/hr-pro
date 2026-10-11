@@ -21,7 +21,7 @@
             <div class="doc-stats">
                 <div class="doc-stat"><span>จำนวนพนักงาน</span><b>{{ number_format($payrolls->count()) }} <small>คน</small></b></div>
                 <div class="doc-stat"><span>รวมเงินเดือน</span><b>{{ $money($totals['base']) }}</b></div>
-                <div class="doc-stat"><span>รวมเบี้ยเลี้ยง</span><b>{{ $money($totals['allowances']) }}</b></div>
+                <div class="doc-stat"><span>รวม OT + เบี้ยเลี้ยง</span><b>{{ $money($totals['overtime'] + $totals['allowances']) }}</b></div>
                 <div class="doc-stat"><span>รวมรายการหัก</span><b>{{ $money($totals['deductions']) }}</b></div>
                 <div class="doc-stat"><span>รวมจ่ายสุทธิ</span><b>{{ $money($totals['net']) }}</b></div>
                 <div class="doc-stat"><span>ยืนยันแล้ว</span><b>{{ $totals['finalized'] }} <small>/ {{ $payrolls->count() }}</small></b></div>
@@ -37,8 +37,11 @@
                             <th>แผนก</th>
                             <th>ตำแหน่ง</th>
                             <th class="num">เงินเดือน</th>
+                            <th class="num">ค่าล่วงเวลา</th>
                             <th class="num">เบี้ยเลี้ยง</th>
-                            <th class="num">รายการหัก</th>
+                            <th class="num">ภาษี</th>
+                            <th class="num">ประกันสังคม</th>
+                            <th class="num">หักอื่น</th>
                             <th class="num">สุทธิ</th>
                             <th class="center">สถานะ</th>
                         </tr>
@@ -52,8 +55,11 @@
                                 <td>{{ $row->employee?->department?->name ?? '—' }}</td>
                                 <td>{{ $row->employee?->position?->title ?? '—' }}</td>
                                 <td class="num">{{ $money($row->base_salary) }}</td>
+                                <td class="num">{{ $money($row->overtime_pay) }}</td>
                                 <td class="num">{{ $money($row->allowances) }}</td>
-                                <td class="num">{{ $money($row->deductions) }}</td>
+                                <td class="num">{{ $money($row->withholding_tax) }}</td>
+                                <td class="num">{{ $money($row->social_security) }}</td>
+                                <td class="num">{{ $money((float) $row->deductions - (float) $row->withholding_tax - (float) $row->social_security) }}</td>
                                 <td class="num"><b>{{ $money($row->net_pay) }}</b></td>
                                 <td class="center">{{ $row->status === 'finalized' ? 'ยืนยันแล้ว' : 'ฉบับร่าง' }}</td>
                             </tr>
@@ -63,8 +69,11 @@
                         <tr>
                             <td colspan="5">รวมทั้งสิ้น {{ number_format($payrolls->count()) }} รายการ</td>
                             <td class="num">{{ $money($totals['base']) }}</td>
+                            <td class="num">{{ $money($totals['overtime']) }}</td>
                             <td class="num">{{ $money($totals['allowances']) }}</td>
-                            <td class="num">{{ $money($totals['deductions']) }}</td>
+                            <td class="num">{{ $money($totals['tax']) }}</td>
+                            <td class="num">{{ $money($totals['sso']) }}</td>
+                            <td class="num">{{ $money($totals['deductions'] - $totals['tax'] - $totals['sso']) }}</td>
                             <td class="num">{{ $money($totals['net']) }}</td>
                             <td></td>
                         </tr>
@@ -72,6 +81,7 @@
                 </table>
             </div>
 
+            <p class="doc-note">หักอื่น = ลาไม่รับค่าจ้าง + กองทุนสำรองเลี้ยงชีพ + รายการหักอื่น · สุทธิ = เงินเดือน + ค่าล่วงเวลา + เบี้ยเลี้ยง − ภาษี − ประกันสังคม − หักอื่น</p>
             <p class="doc-note"><b>ยอดจ่ายสุทธิรวม</b> {{ $money($totals['net']) }} บาท ({{ thai_baht_text($totals['net']) }})</p>
         @endif
 

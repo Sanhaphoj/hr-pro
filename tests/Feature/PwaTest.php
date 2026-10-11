@@ -34,4 +34,9 @@ class PwaTest extends TestCase
             $this->assertFileExists(public_path($file));
         }
     }
+
+    public function test_the_offline_page_is_light_like_the_rest_of_the_app(): void
+    {
+        $this->assertStringNotContainsString('prefers-color-scheme', file_get_contents(public_path('offline.html')));
+    }
 }

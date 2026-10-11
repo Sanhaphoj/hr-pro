@@ -263,6 +263,20 @@ class DemoDataSeeder extends Seeder
             ]);
         }
 
+        // A request is written before it is decided and before the leave
+        // starts. Rows above are stamped "now", which puts the date on the
+        // printed leave form after its approval; move each submission back.
+        LeaveRequest::query()->each(function (LeaveRequest $request) {
+            $submitted = collect([
+                $request->approved_at?->copy()->subDays(fake()->numberBetween(1, 3)),
+                $request->start_date->copy()->subDays(fake()->numberBetween(3, 10))->setTime(9, 0),
+            ])->filter()->min();
+
+            if ($submitted->lt($request->created_at)) {
+                $request->forceFill(['created_at' => $submitted, 'updated_at' => $request->approved_at ?? $submitted])->saveQuietly();
+            }
+        });
+
         // --- Work locations (geofences employees may clock in from) --------
         $workLocationDefs = [
             ['สำนักงานใหญ่ (สีลม)', 'HQ', 'อาคารสำนักงานใหญ่ ถนนสีลม เขตบางรัก กรุงเทพฯ', 13.7248640, 100.5340240, 200],

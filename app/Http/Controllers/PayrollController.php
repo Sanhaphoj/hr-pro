@@ -117,7 +117,10 @@ class PayrollController extends Controller implements HasMiddleware
             'month' => $month,
             'totals' => [
                 'base' => (float) $payrolls->sum('base_salary'),
+                'overtime' => (float) $payrolls->sum('overtime_pay'),
                 'allowances' => (float) $payrolls->sum('allowances'),
+                'tax' => (float) $payrolls->sum('withholding_tax'),
+                'sso' => (float) $payrolls->sum('social_security'),
                 'deductions' => (float) $payrolls->sum('deductions'),
                 'net' => (float) $payrolls->sum('net_pay'),
                 'finalized' => $payrolls->where('status', 'finalized')->count(),

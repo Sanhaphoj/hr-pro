@@ -37,8 +37,13 @@
             <h2 class="doc-section__title">ผลการประเมิน</h2>
             <div class="score">
                 <div class="score__total">
-                    <b>{{ $review->score }}<small> / 5</small></b>
-                    <span>{{ $scale[$review->score][0] ?? '—' }}</span>
+                    @if($review->score)
+                        <b>{{ $review->score }}<small> / 5</small></b>
+                        <span>{{ $scale[$review->score][0] ?? '—' }}</span>
+                    @else
+                        <b>—</b>
+                        <span>ยังไม่ให้คะแนน</span>
+                    @endif
                 </div>
                 <table class="doc-table doc-table--compact">
                     <thead><tr><th class="center">ระดับ</th><th>ผลการประเมิน</th><th>ความหมาย</th><th class="center">ผล</th></tr></thead>

@@ -143,7 +143,11 @@
                                 <td>{{ $enrollment->course?->title ?? '—' }}</td>
                                 <td class="num">{{ $enrollment->course?->hours ?? '—' }}</td>
                                 <td class="nowrap">{{ thai_date($enrollment->course?->scheduled_date, 'short') }}</td>
-                                <td>{{ $enrollment->status === 'completed' ? 'จบหลักสูตร '.thai_date($enrollment->completed_at, 'short') : 'กำลังอบรม' }}</td>
+                                <td>{{ match ($enrollment->status) {
+                                    'completed' => 'จบหลักสูตร '.thai_date($enrollment->completed_at, 'short'),
+                                    'cancelled' => 'ยกเลิก',
+                                    default => 'ลงทะเบียนแล้ว',
+                                } }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -164,7 +168,7 @@
                         @foreach($reviews as $review)
                             <tr>
                                 <td>{{ $review->period }}</td>
-                                <td class="num">{{ $review->score }} / 5</td>
+                                <td class="num">{{ $review->score ? $review->score.' / 5' : 'ยังไม่ให้คะแนน' }}</td>
                                 <td class="nowrap">{{ thai_date($review->reviewed_at, 'short') }}</td>
                             </tr>
                         @endforeach

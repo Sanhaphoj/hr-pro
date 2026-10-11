@@ -77,7 +77,11 @@ class TrainingController extends Controller implements HasMiddleware
         $training->load(['enrollments.employee.department']);
         $training->setRelation(
             'enrollments',
-            $training->enrollments->sortBy(fn (TrainingEnrollment $e) => $e->employee?->full_name)->values(),
+            // Someone whose enrolment was cancelled has no line to sign.
+            $training->enrollments
+                ->reject(fn (TrainingEnrollment $e) => $e->status === 'cancelled')
+                ->sortBy(fn (TrainingEnrollment $e) => $e->employee?->full_name)
+                ->values(),
         );
 
         return view('print.training', ['course' => $training]);
