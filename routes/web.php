@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AppearanceController;
+use App\Http\Controllers\AssistantController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendancePhotoController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -115,6 +116,9 @@ Route::middleware(['auth', 'active', 'password.changed'])->group(function () {
 
     // Live record results for the Ctrl+K command palette.
     Route::get('/search', SearchController::class)->name('search')->middleware('throttle:60,1');
+
+    // "ผู้ช่วย HR" (Claude). Throttled per person: every question is a paid API call.
+    Route::post('/assistant', [AssistantController::class, 'ask'])->name('assistant.ask')->middleware('throttle:20,1');
 
     Route::get('/leave-approvals', [LeaveApprovalController::class, 'index'])->name('leave-approvals.index');
     Route::post('/leave-approvals/{leaveRequest}/approve', [LeaveApprovalController::class, 'approve'])->name('leave-approvals.approve');

@@ -2094,3 +2094,82 @@ kbd {
 .payslip__net span { font-weight: 600; }
 .payslip__net b { font-size: 26px; letter-spacing: -.02em; color: var(--c-text); }
 @media (max-width: 640px) { .payslip { grid-template-columns: 1fr; } }
+
+
+/* ==========================================================================
+   ผู้ช่วย HR (AI assistant)
+   ========================================================================== */
+.aibot { position: fixed; z-index: 60; right: 20px; bottom: 20px; }
+.aibot__fab {
+    display: inline-flex; align-items: center; gap: 9px; height: 48px; padding: 0 20px 0 16px;
+    border: 0; border-radius: 999px; cursor: pointer; font: inherit; font-weight: 600; font-size: 14px; color: #fff;
+    background: linear-gradient(120deg, var(--g-1), var(--c-brand) 55%, var(--g-2));
+    box-shadow: 0 8px 24px rgba(14, 143, 136, .38), inset 0 1px 0 rgba(255, 255, 255, .25);
+    transition: transform .16s, box-shadow .16s;
+}
+.aibot__fab:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(14, 143, 136, .44); }
+.aibot__fab svg { width: 19px; height: 19px; }
+.aibot.is-open .aibot__fab { display: none; }
+@media (prefers-reduced-motion: no-preference) {
+    .aibot__fab svg { animation: aibot-twinkle 3.2s ease-in-out infinite; }
+}
+@keyframes aibot-twinkle { 0%, 80%, 100% { rotate: 0deg; scale: 1; } 88% { rotate: 18deg; scale: 1.18; } }
+
+.aibot__panel {
+    width: min(390px, calc(100vw - 24px)); height: min(600px, calc(100vh - 40px));
+    display: flex; flex-direction: column;
+    background: var(--c-surface); color: var(--c-text);
+    border: 1px solid var(--c-border); border-radius: 22px; box-shadow: var(--shadow-lg); overflow: hidden;
+    animation: aibot-in .22s cubic-bezier(.2, .9, .3, 1.15);
+    transform-origin: bottom right;
+}
+.aibot__panel[hidden] { display: none; }
+@keyframes aibot-in { from { opacity: 0; scale: .92; } }
+.aibot__head {
+    display: flex; align-items: center; gap: 11px; padding: 14px 12px 14px 16px; color: #fff;
+    background: linear-gradient(120deg, var(--c-ink), var(--c-brand-700));
+}
+.aibot__head > div { flex: 1; min-width: 0; line-height: 1.35; }
+.aibot__head small { display: block; font-size: 11.5px; opacity: .75; }
+.aibot__badge { width: 36px; height: 36px; flex: none; display: grid; place-items: center; border-radius: 12px; background: rgba(255, 255, 255, .16); }
+.aibot__badge svg { width: 19px; height: 19px; }
+.aibot__icon { width: 32px; height: 32px; flex: none; display: grid; place-items: center; border: 0; border-radius: 50%; background: none; color: inherit; cursor: pointer; opacity: .8; }
+.aibot__icon:hover { background: rgba(255, 255, 255, .14); opacity: 1; }
+
+.aibot__log { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; background: var(--c-surface-sunk); }
+.aibot__hello p { margin: 0 0 12px; font-size: 14px; line-height: 1.6; }
+.aibot__chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.aibot__chip {
+    font: inherit; font-size: 12.5px; text-align: left; cursor: pointer;
+    padding: 7px 12px; border-radius: 999px; border: 1px solid var(--c-border);
+    background: var(--c-surface); color: var(--c-text-soft); transition: border-color .14s, color .14s;
+}
+.aibot__chip:hover { border-color: var(--c-brand); color: var(--c-brand-700); }
+.aibot__msg { max-width: 86%; padding: 10px 13px; border-radius: 16px; font-size: 13.5px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+.aibot__msg--user { align-self: flex-end; background: var(--c-brand); color: #fff; border-bottom-right-radius: 5px; }
+.aibot__msg--assistant { align-self: flex-start; background: var(--c-surface); border: 1px solid var(--c-border); border-bottom-left-radius: 5px; }
+.aibot__msg--assistant a { font-weight: 600; }
+.aibot__msg.is-error { border-color: var(--c-warning); background: var(--c-warning-bg); }
+.aibot__msg.is-typing { display: flex; gap: 4px; padding: 13px 15px; }
+.aibot__msg.is-typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--c-muted); animation: aibot-dot 1s ease-in-out infinite; }
+.aibot__msg.is-typing i:nth-child(2) { animation-delay: .15s; }
+.aibot__msg.is-typing i:nth-child(3) { animation-delay: .3s; }
+@keyframes aibot-dot { 0%, 100% { opacity: .3; translate: 0 0; } 40% { opacity: 1; translate: 0 -3px; } }
+
+.aibot__form { display: flex; align-items: flex-end; gap: 8px; padding: 10px 10px 6px 14px; border-top: 1px solid var(--c-border); }
+.aibot__form textarea {
+    flex: 1; resize: none; border: 0; outline: none; background: none; color: var(--c-text);
+    font: inherit; font-size: 14px; line-height: 1.5; padding: 8px 0; max-height: 120px;
+}
+.aibot__send { width: 38px; height: 38px; flex: none; display: grid; place-items: center; border: 0; border-radius: 50%; cursor: pointer; background: var(--c-brand); color: #fff; }
+.aibot__send:disabled { opacity: .45; cursor: wait; }
+.aibot__note { margin: 0; padding: 0 14px 10px; font-size: 10.5px; color: var(--c-muted); }
+
+@media (max-width: 640px) {
+    .aibot { right: 12px; bottom: 12px; }
+    .aibot__fab { width: 52px; height: 52px; padding: 0; justify-content: center; }
+    .aibot__fab span { display: none; }
+    .aibot.is-open { inset: 0; }
+    .aibot__panel { width: 100%; height: 100%; border-radius: 0; border: 0; }
+}
+@media print { .aibot { display: none !important; } }

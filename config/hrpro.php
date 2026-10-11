@@ -135,6 +135,14 @@ return [
         'use_on_documents' => true,
     ],
 
+    // "ผู้ช่วย HR" — answers employees' questions about their own leave,
+    // attendance and pay with Claude. Shown only when an API key is set.
+    'ai' => [
+        'enabled' => filter_var(env('HRPRO_AI_ENABLED', true), FILTER_VALIDATE_BOOL),
+        'api_key' => env('ANTHROPIC_API_KEY'),
+        'model' => env('HRPRO_AI_MODEL', 'claude-opus-5-5'),
+    ],
+
     // Look of new accounts and of the sign-in screen.
     'appearance' => [
         'theme' => 'teal',

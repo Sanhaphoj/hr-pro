@@ -13,6 +13,7 @@
         ['group' => 'ทำทันที', 'title' => 'ยื่นใบลา', 'url' => route('leave-requests.create'), 'icon' => 'plus', 'keywords' => 'leave request ลาป่วย ลากิจ ลาพักร้อน'],
         $user->hasPermission('employees.create') ? ['group' => 'ทำทันที', 'title' => 'เพิ่มพนักงานใหม่', 'url' => route('employees.create'), 'icon' => 'plus', 'keywords' => 'new employee add hire'] : null,
         $user->hasPermission('announcements.manage') ? ['group' => 'ทำทันที', 'title' => 'เขียนประกาศ', 'url' => route('announcements.create'), 'icon' => 'megaphone', 'keywords' => 'announcement news post'] : null,
+        \App\Services\AssistantService::enabled() ? ['group' => 'ทำทันที', 'title' => 'ถามผู้ช่วย HR', 'action' => 'assistant', 'icon' => 'sparkles', 'keywords' => 'ai assistant chat claude ถาม ช่วย'] : null,
         ['group' => 'ทำทันที', 'title' => 'สลับโหมดมืด / สว่าง', 'action' => 'scheme', 'icon' => 'moon', 'keywords' => 'dark light theme mode ธีม กลางคืน'],
         app()->getLocale() === 'th'
             ? ['group' => 'ทำทันที', 'title' => 'Switch to English', 'url' => route('locale.update', 'en'), 'icon' => 'refresh', 'keywords' => 'language ภาษา english']

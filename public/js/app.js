@@ -326,6 +326,7 @@
         function run(item) {
             if (!item) return;
             if (item.action === 'scheme') { cmdk.close(); toggleScheme(); return; }
+            if (item.action === 'assistant') { cmdk.close(); window.hrproAssistant && window.hrproAssistant.open(); return; }
             if (item.url) window.location.href = item.url;
         }
 
@@ -370,6 +371,128 @@
             else if (e.key === '/' && !typing && !cmdk.open) { e.preventDefault(); open(); }
         });
         document.querySelectorAll('[data-cmdk-open]').forEach(function (btn) { btn.addEventListener('click', open); });
+    }
+
+    // --- ผู้ช่วย HR (AI assistant) -------------------------------------------
+    // The conversation lives in this tab's sessionStorage, keyed by account,
+    // so a shared computer never shows one person's chat to the next.
+    const bot = document.querySelector('[data-assistant]');
+    if (bot) {
+        const panel = bot.querySelector('.aibot__panel');
+        const log = bot.querySelector('[data-assistant-log]');
+        const form = bot.querySelector('[data-assistant-form]');
+        const box = form.querySelector('textarea');
+        const send = form.querySelector('button');
+        const storeKey = 'hrpro.assistant.' + bot.dataset.user;
+        let history = [];
+        try { history = JSON.parse(sessionStorage.getItem(storeKey) || '[]'); } catch (e) { history = []; }
+        let busy = false;
+
+        // Model text is shown as text: escaped first, then only **bold**,
+        // "- " bullets and the app's own paths are turned into markup.
+        function format(text) {
+            const esc = text.replace(/[&<>"']/g, function (c) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+            });
+            return esc
+                .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+                .replace(/^\s*[-•]\s+/gm, '• ')
+                .replace(/(^|[\s(])(\/(?:time-clock|leave-requests\/create|leave-requests|leave-calendar|attendance|my\/payslips|announcements|profile))(?=[\s).,]|$)/g,
+                    '$1<a href="$2">$2</a>');
+        }
+
+        function bubble(role, text, extraClass) {
+            const el = document.createElement('div');
+            el.className = 'aibot__msg aibot__msg--' + role + (extraClass ? ' ' + extraClass : '');
+            if (role === 'assistant') el.innerHTML = format(text); else el.textContent = text;
+            log.appendChild(el);
+            log.scrollTop = log.scrollHeight;
+            return el;
+        }
+
+        function restore() {
+            log.querySelectorAll('.aibot__msg').forEach(function (m) { m.remove(); });
+            log.querySelector('.aibot__hello').hidden = history.length > 0;
+            history.forEach(function (t) { bubble(t.role, t.content); });
+        }
+        restore();
+
+        function save() {
+            try { sessionStorage.setItem(storeKey, JSON.stringify(history.slice(-20))); } catch (e) { /* private mode */ }
+        }
+
+        function toggle(open) {
+            panel.hidden = !open;
+            bot.classList.toggle('is-open', open);
+            bot.querySelectorAll('[data-assistant-toggle]').forEach(function (b) { b.setAttribute('aria-expanded', open ? 'true' : 'false'); });
+            if (open) { box.focus(); log.scrollTop = log.scrollHeight; }
+        }
+
+        function ask(question) {
+            question = question.trim();
+            if (!question || busy) return;
+            busy = true;
+            send.disabled = true;
+            log.querySelector('.aibot__hello').hidden = true;
+            bubble('user', question);
+            const typing = bubble('assistant', '', 'is-typing');
+            typing.innerHTML = '<i></i><i></i><i></i>';
+
+            fetch(bot.dataset.url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf },
+                body: JSON.stringify({ message: question, history: history }),
+            })
+                .then(function (r) {
+                    if (r.status === 429) return { reply: 'ถามถี่เกินไป กรุณารอสักครู่แล้วลองใหม่', ok: false };
+                    return r.json().then(function (data) {
+                        return r.ok ? data : { reply: data.error?.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่', ok: false };
+                    });
+                })
+                .catch(function () { return { reply: 'เชื่อมต่อไม่ได้ กรุณาตรวจสอบอินเทอร์เน็ต', ok: false }; })
+                .then(function (data) {
+                    typing.remove();
+                    bubble('assistant', data.reply, data.ok ? '' : 'is-error');
+                    // Only a real answer joins the history the model sees next time.
+                    if (data.ok) {
+                        history.push({ role: 'user', content: question }, { role: 'assistant', content: data.reply });
+                        save();
+                    }
+                    busy = false;
+                    send.disabled = false;
+                    box.focus();
+                });
+        }
+
+        bot.querySelectorAll('[data-assistant-toggle]').forEach(function (b) {
+            b.addEventListener('click', function () { toggle(panel.hidden); });
+        });
+        bot.querySelectorAll('[data-assistant-ask]').forEach(function (chip) {
+            chip.addEventListener('click', function () { ask(chip.textContent); });
+        });
+        bot.querySelector('[data-assistant-clear]').addEventListener('click', function () {
+            history = [];
+            save();
+            restore();
+        });
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const q = box.value;
+            box.value = '';
+            box.style.height = '';
+            ask(q);
+        });
+        box.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); form.requestSubmit(); }
+        });
+        box.addEventListener('input', function () {
+            box.style.height = '';
+            box.style.height = Math.min(box.scrollHeight, 120) + 'px';
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && !panel.hidden) toggle(false);
+        });
+        window.hrproAssistant = { open: function () { toggle(true); } };
     }
 
     // --- Installable app ----------------------------------------------------
