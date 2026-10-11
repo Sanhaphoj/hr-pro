@@ -37,10 +37,18 @@ class DocumentController extends Controller implements HasMiddleware
 
     public function store(Request $request): RedirectResponse
     {
+        // Settings → Documents.
+        $types = (array) config('hrpro.documents.allowed_types', ['pdf']);
+        $maxMb = max(1, (int) config('hrpro.documents.max_upload_mb', 10));
+
         $data = $request->validate([
             'title' => ['required', 'string', 'max:150'],
             'category' => ['required', 'in:'.implode(',', array_keys(Document::CATEGORY_LABELS))],
-            'file' => ['required', 'file', 'mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png', 'max:10240'],
+            'file' => ['required', 'file', 'mimes:'.implode(',', $types), 'max:'.($maxMb * 1024)],
+        ], [
+            'file.required' => 'กรุณาเลือกไฟล์เอกสาร',
+            'file.mimes' => 'ชนิดไฟล์ไม่รองรับ (รองรับ '.strtoupper(implode(', ', $types)).')',
+            'file.max' => "ไฟล์ต้องมีขนาดไม่เกิน {$maxMb} MB",
         ]);
 
         $file = $request->file('file');
